@@ -1263,9 +1263,10 @@ window.analyzeAll = async function() {
   // Fetch fresh prices first
   await fetchMarketData();
 
-  // Analyze sequentially to avoid rate limits
-  for (const c of COINS) {
-    await analyzeCoinInternal(c.id);
+  // Analyze sequentially with delay to avoid rate limits
+  for (let i = 0; i < COINS.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 4000)); // 4초 간격
+    await analyzeCoinInternal(COINS[i].id);
   }
 
   btn.disabled = false;

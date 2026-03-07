@@ -7,8 +7,37 @@ const CORS_HEADERS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function callAnthropic(apiKey, prompt, attempt = 0) {
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-beta': 'web-search-2025-03-05',
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1024,
+      tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 1 }],
+      messages: [{ role: 'user', content: prompt }],
+    }),
+  });
+
+  // 429 Rate Limit: 지수 백오프 후 재시도 (최대 3회)
+  if (response.status === 429 && attempt < 3) {
+    const retryAfter = parseInt(response.headers.get('retry-after') || '0', 10);
+    const delay = retryAfter > 0 ? retryAfter * 1000 : (attempt + 1) * 8000;
+    await sleep(delay);
+    return callAnthropic(apiKey, prompt, attempt + 1);
+  }
+
+  return response;
+}
+
 exports.handler = async (event) => {
-  // Preflight
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 204, headers: CORS_HEADERS, body: '' };
   }
@@ -38,22 +67,7 @@ exports.handler = async (event) => {
   }
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
-        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }],
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    });
-
+    const response = await callAnthropic(apiKey, prompt);
     const data = await response.json();
 
     if (!response.ok) {
