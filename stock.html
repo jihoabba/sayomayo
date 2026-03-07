@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COIN SAYOMAYO</title>
+<title>STOCK SAYOMAYO</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -24,10 +24,11 @@
     --hold-dim: rgba(255,215,0,0.1);
     --up: #00ff88;
     --down: #ff3366;
-    --btc-color: #f7931a;
-    --eth-color: #627eea;
-    --xrp-color: #00aae4;
-    --sol-color: #9945ff;
+    --googl-color: #4285f4;
+    --tsla-color: #e31937;
+    --cpng-color: #ff6600;
+    --coinbase-color: #6b6bff;
+    --naver-color: #03c75a;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -83,7 +84,7 @@
     color: var(--text);
   }
 
-  .logo .coin { color: var(--btc-color); }
+  .logo .stock-word { color: var(--accent); }
   .logo .dot { color: var(--accent); }
 
   /* ── Mode Toggle ── */
@@ -241,15 +242,15 @@
   .btn-analyze-all:hover { background: #00cc6e; transform: translateY(-1px); }
   .btn-analyze-all:disabled { background: var(--border-light); color: var(--text-dim); cursor: not-allowed; transform: none; }
 
-  /* ── Coin Grid ── */
-  .coin-grid {
+  /* ── Stock Grid ── */
+  .stock-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 
-  /* ── Coin Card ── */
-  .coin-card {
+  /* ── Stock Card ── */
+  .stock-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 2px;
@@ -257,12 +258,13 @@
     transition: border-color 0.3s, transform 0.2s;
   }
 
-  .coin-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+  .stock-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
 
-  .coin-card[data-coin="BTC"] { --coin-color: var(--btc-color); }
-  .coin-card[data-coin="ETH"] { --coin-color: var(--eth-color); }
-  .coin-card[data-coin="XRP"] { --coin-color: var(--xrp-color); }
-  .coin-card[data-coin="SOL"] { --coin-color: var(--sol-color); }
+  .stock-card[data-stock="GOOGL"]    { --stock-color: var(--googl-color); }
+  .stock-card[data-stock="TSLA"]     { --stock-color: var(--tsla-color); }
+  .stock-card[data-stock="CPNG"]     { --stock-color: var(--cpng-color); }
+  .stock-card[data-stock="COINBASE"] { --stock-color: var(--coinbase-color); }
+  .stock-card[data-stock="NAVER"]    { --stock-color: var(--naver-color); }
 
   .card-top {
     padding: 16px 20px 14px;
@@ -279,20 +281,20 @@
     position: absolute;
     top: 0; left: 0;
     width: 3px; height: 100%;
-    background: var(--coin-color);
+    background: var(--stock-color);
   }
 
-  .card-coin-info { padding-left: 6px; }
+  .card-stock-info { padding-left: 6px; }
 
-  .card-coin-id {
+  .card-stock-id {
     font-family: 'Syne', sans-serif;
     font-size: 20px;
     font-weight: 800;
-    color: var(--coin-color);
+    color: var(--stock-color);
     letter-spacing: -0.5px;
   }
 
-  .card-coin-name {
+  .card-stock-name {
     font-size: 11px;
     color: var(--text-muted);
     margin-top: 2px;
@@ -313,7 +315,7 @@
     align-self: flex-start;
   }
 
-  .card-analyze-btn:hover { border-color: var(--coin-color); color: var(--coin-color); }
+  .card-analyze-btn:hover { border-color: var(--stock-color); color: var(--stock-color); }
   .card-analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* Price section */
@@ -505,16 +507,14 @@
   }
 
   /* ── History Tab ── */
-  .history-section { }
-
-  .coin-selector {
+  .stock-selector {
     display: flex;
     gap: 8px;
     margin-bottom: 24px;
     flex-wrap: wrap;
   }
 
-  .coin-sel-btn {
+  .stock-sel-btn {
     background: transparent;
     border: 1px solid var(--border-light);
     color: var(--text-muted);
@@ -528,12 +528,13 @@
     transition: all 0.2s;
   }
 
-  .coin-sel-btn:hover { color: var(--text); border-color: var(--text-muted); }
+  .stock-sel-btn:hover { color: var(--text); border-color: var(--text-muted); }
 
-  .coin-sel-btn.active[data-coin="BTC"] { color: var(--btc-color); border-color: var(--btc-color); background: rgba(247,147,26,0.08); }
-  .coin-sel-btn.active[data-coin="ETH"] { color: var(--eth-color); border-color: var(--eth-color); background: rgba(98,126,234,0.08); }
-  .coin-sel-btn.active[data-coin="XRP"] { color: var(--xrp-color); border-color: var(--xrp-color); background: rgba(0,174,228,0.08); }
-  .coin-sel-btn.active[data-coin="SOL"] { color: var(--sol-color); border-color: var(--sol-color); background: rgba(153,69,255,0.08); }
+  .stock-sel-btn.active[data-stock="GOOGL"]    { color: var(--googl-color); border-color: var(--googl-color); background: rgba(66,133,244,0.08); }
+  .stock-sel-btn.active[data-stock="TSLA"]     { color: var(--tsla-color);  border-color: var(--tsla-color);  background: rgba(227,25,55,0.08); }
+  .stock-sel-btn.active[data-stock="CPNG"]     { color: var(--cpng-color);  border-color: var(--cpng-color);  background: rgba(255,102,0,0.08); }
+  .stock-sel-btn.active[data-stock="COINBASE"] { color: var(--coinbase-color); border-color: var(--coinbase-color); background: rgba(107,107,255,0.08); }
+  .stock-sel-btn.active[data-stock="NAVER"]    { color: var(--naver-color); border-color: var(--naver-color); background: rgba(3,199,90,0.08); }
 
   /* Hit Rate */
   .hit-rate-box {
@@ -600,7 +601,6 @@
   .hit-rate-bar-fill.warn { background: var(--hold); }
   .hit-rate-bar-fill.bad  { background: var(--danger); }
 
-  /* Improvement box */
   .improvement-box {
     padding: 16px 20px;
     background: var(--danger-dim);
@@ -648,7 +648,6 @@
     font-size: 10px;
   }
 
-  /* History list */
   .history-list-header {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
@@ -760,7 +759,6 @@
   .toast.error   { border-color: var(--danger); color: var(--danger); }
   .toast.success { border-color: var(--accent); color: var(--accent); }
 
-  /* Disclaimer */
   .disclaimer {
     margin-top: 48px;
     padding: 14px 18px;
@@ -778,17 +776,20 @@
     letter-spacing: 2px;
   }
 
-  /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
 
   @media (max-width: 650px) {
-    .coin-grid { grid-template-columns: 1fr; }
+    .stock-grid { grid-template-columns: 1fr; }
     .hit-rate-box { flex-direction: column; align-items: flex-start; }
     .price-krw { font-size: 18px; }
     .mode-toggle { display: none; }
-    .mobile-toggle { display: flex !important; justify-content: center; margin-bottom: 20px; }
+    .mobile-toggle {
+      display: flex !important;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
   }
 
   .mobile-toggle { display: none; }
@@ -798,13 +799,13 @@
 
 <header>
   <div class="container">
-    <div class="logo"><span class="coin">COIN</span> SAYOMAYO<span class="dot">.</span></div>
+    <div class="logo"><span class="stock-word">STOCK</span> SAYOMAYO<span class="dot">.</span></div>
     <div class="mode-toggle">
-      <a href="index.html" class="mode-btn active">COIN</a>
-      <a href="stock.html" class="mode-btn">STOCK</a>
+      <a href="index.html" class="mode-btn">COIN</a>
+      <a href="stock.html" class="mode-btn active">STOCK</a>
     </div>
     <div class="header-meta">
-      <span><span class="live-dot"></span>AI 코인 분석</span>
+      <span><span class="live-dot"></span>AI 주식 분석</span>
       <span id="currentTime">--:--:--</span>
     </div>
   </div>
@@ -816,36 +817,36 @@
     <!-- Mobile Toggle -->
     <div class="mobile-toggle">
       <div class="mode-toggle" style="display:flex">
-        <a href="index.html" class="mode-btn active">COIN</a>
-        <a href="stock.html" class="mode-btn">STOCK</a>
+        <a href="index.html" class="mode-btn">COIN</a>
+        <a href="stock.html" class="mode-btn active">STOCK</a>
       </div>
     </div>
 
     <!-- Market Bar -->
     <div class="market-bar">
       <div class="market-item">
-        <div class="market-label">BTC/KRW</div>
-        <div class="market-value" id="mb-btc">—</div>
+        <div class="market-label">GOOGL</div>
+        <div class="market-value" id="mb-googl">—</div>
       </div>
       <div class="market-item">
-        <div class="market-label">ETH/KRW</div>
-        <div class="market-value" id="mb-eth">—</div>
+        <div class="market-label">TSLA</div>
+        <div class="market-value" id="mb-tsla">—</div>
       </div>
       <div class="market-item">
-        <div class="market-label">XRP/KRW</div>
-        <div class="market-value" id="mb-xrp">—</div>
+        <div class="market-label">CPNG</div>
+        <div class="market-value" id="mb-cpng">—</div>
       </div>
       <div class="market-item">
-        <div class="market-label">SOL/KRW</div>
-        <div class="market-value" id="mb-sol">—</div>
+        <div class="market-label">COIN</div>
+        <div class="market-value" id="mb-coin">—</div>
+      </div>
+      <div class="market-item">
+        <div class="market-label">NAVER</div>
+        <div class="market-value" id="mb-naver">—</div>
       </div>
       <div class="market-item">
         <div class="market-label">USD/KRW</div>
         <div class="market-value" id="mb-usdkrw">—</div>
-      </div>
-      <div class="market-item">
-        <div class="market-label">공포&탐욕</div>
-        <div class="market-value" id="mb-fg">—</div>
       </div>
     </div>
 
@@ -862,18 +863,19 @@
         <button class="btn-analyze-all" id="analyzeAllBtn" onclick="analyzeAll()">▶ 전체 분석</button>
       </div>
 
-      <div class="coin-grid" id="coinGrid">
+      <div class="stock-grid" id="stockGrid">
         <!-- Cards injected by JS -->
       </div>
     </div>
 
     <!-- History Tab -->
     <div class="tab-content" id="tab-history">
-      <div class="coin-selector" id="coinSelector">
-        <button class="coin-sel-btn active" data-coin="BTC" onclick="selectHistoryCoin('BTC')">BTC</button>
-        <button class="coin-sel-btn" data-coin="ETH" onclick="selectHistoryCoin('ETH')">ETH</button>
-        <button class="coin-sel-btn" data-coin="XRP" onclick="selectHistoryCoin('XRP')">XRP</button>
-        <button class="coin-sel-btn" data-coin="SOL" onclick="selectHistoryCoin('SOL')">SOL</button>
+      <div class="stock-selector" id="stockSelector">
+        <button class="stock-sel-btn active" data-stock="GOOGL" onclick="selectHistoryStock('GOOGL')">GOOGL</button>
+        <button class="stock-sel-btn" data-stock="TSLA" onclick="selectHistoryStock('TSLA')">TSLA</button>
+        <button class="stock-sel-btn" data-stock="CPNG" onclick="selectHistoryStock('CPNG')">CPNG</button>
+        <button class="stock-sel-btn" data-stock="COINBASE" onclick="selectHistoryStock('COINBASE')">COIN</button>
+        <button class="stock-sel-btn" data-stock="NAVER" onclick="selectHistoryStock('NAVER')">NAVER</button>
       </div>
 
       <div id="historyContent">
@@ -904,35 +906,35 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const HISTORY_COLLECTION = 'coin_history';
+const HISTORY_COLLECTION = 'stock_history';
 
 // ==================== CONSTANTS ====================
-const COINS = [
-  { id: 'BTC', name: '비트코인',  geckoId: 'bitcoin',  emoji: '₿' },
-  { id: 'ETH', name: '이더리움',  geckoId: 'ethereum', emoji: 'Ξ' },
-  { id: 'XRP', name: '리플',      geckoId: 'ripple',   emoji: '✕' },
-  { id: 'SOL', name: '솔라나',    geckoId: 'solana',   emoji: '◎' },
+const STOCKS = [
+  { id: 'GOOGL',    name: '알파벳 A (구글)', symbol: 'GOOGL',     emoji: 'G', currency: 'USD' },
+  { id: 'TSLA',     name: '테슬라',          symbol: 'TSLA',      emoji: 'T', currency: 'USD' },
+  { id: 'CPNG',     name: '쿠팡',            symbol: 'CPNG',      emoji: 'C', currency: 'USD' },
+  { id: 'COINBASE', name: '코인베이스',       symbol: 'COIN',      emoji: '◎', currency: 'USD' },
+  { id: 'NAVER',    name: '네이버',           symbol: '035420.KS', emoji: 'N', currency: 'KRW' },
 ];
 
 const SIGNAL_MAP = {
-  BUY:     { cls: 'sig-buy',     label: '▲ 추가 매수' },
+  BUY:     { cls: 'sig-buy',     label: '▲ 매수' },
   HOLD:    { cls: 'sig-hold',    label: '◼ 보류' },
   PARTIAL: { cls: 'sig-partial', label: '▽ 분할 매도' },
-  SELL:    { cls: 'sig-sell',    label: '▼ 전량 매도' },
+  SELL:    { cls: 'sig-sell',    label: '▼ 매도' },
 };
 
 // ==================== STATE ====================
 let usdKrw = 1350;
-let prices = {};   // { BTC: { usd, krw, change24h } }
-let analyses = {}; // { BTC: { loading, signal, analysis, indicators, analyzedAt, priceKRW, priceUSD, prevComment } }
-let histories = {}; // { BTC: [ ...entries ] }
-let activeHistoryCoin = 'BTC';
+let prices = {};    // { GOOGL: { usd, krw, change } }
+let analyses = {};  // { GOOGL: { loading, signal, analysis, indicators, ... } }
+let histories = {}; // { GOOGL: [...] }
+let activeHistoryStock = 'GOOGL';
 let activeTab = 'current';
 
-// Init state
-COINS.forEach(c => {
-  analyses[c.id] = { loading: false, signal: null, analysis: null, indicators: null, analyzedAt: null, priceKRW: null, priceUSD: null, prevComment: null };
-  histories[c.id] = [];
+STOCKS.forEach(s => {
+  analyses[s.id] = { loading: false, signal: null, analysis: null, indicators: null, analyzedAt: null, priceKRW: null, priceUSD: null, prevComment: null };
+  histories[s.id] = [];
 });
 
 // ==================== TIME ====================
@@ -954,7 +956,7 @@ window.switchTab = function(tab) {
   if (tab === 'history') renderHistoryTab();
 };
 
-// ==================== MARKET OVERVIEW ====================
+// ==================== MARKET DATA ====================
 async function fetchMarketData() {
   // USD/KRW
   try {
@@ -964,56 +966,58 @@ async function fetchMarketData() {
     document.getElementById('mb-usdkrw').textContent = Math.round(usdKrw).toLocaleString() + '원';
   } catch(e) {}
 
-  // Coin prices
+  // Stock prices via Netlify function
   try {
-    const ids = COINS.map(c => c.geckoId).join(',');
-    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+    const r = await fetch('/.netlify/functions/stock-price');
     const d = await r.json();
-    COINS.forEach(c => {
-      const data = d[c.geckoId];
-      if (data) {
-        const krw = Math.round(data.usd * usdKrw);
-        prices[c.id] = { usd: data.usd, krw, change24h: data.usd_24h_change };
-        const mbEl = document.getElementById(`mb-${c.id.toLowerCase()}`);
-        if (mbEl) {
-          mbEl.textContent = '₩' + krw.toLocaleString();
-          mbEl.style.color = data.usd_24h_change >= 0 ? 'var(--up)' : 'var(--down)';
-        }
+
+    STOCKS.forEach(stock => {
+      const key = stock.symbol;
+      const data = d[key];
+      if (!data) return;
+
+      let priceKRW, priceUSD;
+      if (stock.currency === 'KRW') {
+        priceKRW = Math.round(data.price);
+        priceUSD = null;
+      } else {
+        priceUSD = data.price;
+        priceKRW = Math.round(data.price * usdKrw);
+      }
+
+      prices[stock.id] = { usd: priceUSD, krw: priceKRW, change: data.change, currency: stock.currency };
+
+      const mbMap = { GOOGL: 'mb-googl', TSLA: 'mb-tsla', CPNG: 'mb-cpng', COINBASE: 'mb-coin', NAVER: 'mb-naver' };
+      const mbEl = document.getElementById(mbMap[stock.id]);
+      if (mbEl) {
+        mbEl.textContent = stock.currency === 'KRW'
+          ? '₩' + priceKRW.toLocaleString()
+          : '$' + data.price.toLocaleString(undefined, { maximumFractionDigits: 2 });
+        mbEl.style.color = data.change >= 0 ? 'var(--up)' : 'var(--down)';
       }
     });
   } catch(e) {}
 
-  // Fear & Greed
-  try {
-    const r = await fetch('https://api.alternative.me/fng/?limit=1');
-    const d = await r.json();
-    const val = parseInt(d.data[0].value);
-    const label = d.data[0].value_classification;
-    const el = document.getElementById('mb-fg');
-    el.textContent = `${val} (${label})`;
-    el.style.color = val > 60 ? 'var(--up)' : val < 40 ? 'var(--down)' : 'var(--hold)';
-  } catch(e) {}
-
-  renderCoinGrid();
+  renderStockGrid();
 }
 
 // ==================== FIREBASE ====================
 async function loadHistories() {
-  for (const c of COINS) {
+  for (const s of STOCKS) {
     try {
-      const ref = doc(db, HISTORY_COLLECTION, c.id);
+      const ref = doc(db, HISTORY_COLLECTION, s.id);
       const snap = await getDoc(ref);
       if (snap.exists()) {
-        histories[c.id] = snap.data().history || [];
+        histories[s.id] = snap.data().history || [];
       }
     } catch(e) {}
   }
 }
 
-async function saveHistory(coinId) {
+async function saveHistory(stockId) {
   try {
-    const ref = doc(db, HISTORY_COLLECTION, coinId);
-    await setDoc(ref, { history: histories[coinId] });
+    const ref = doc(db, HISTORY_COLLECTION, stockId);
+    await setDoc(ref, { history: histories[stockId] });
   } catch(e) {
     console.warn('Firebase save failed:', e);
   }
@@ -1030,62 +1034,47 @@ function isCorrect(signal, priceBefore, priceAfter) {
   return null;
 }
 
-function calcHitRate(coinId) {
-  const hist = histories[coinId];
+function calcHitRate(stockId) {
+  const hist = histories[stockId];
   const judged = hist.filter(e => e.wasCorrect !== null && e.wasCorrect !== undefined);
   if (judged.length === 0) return { rate: null, correct: 0, total: 0 };
   const correct = judged.filter(e => e.wasCorrect === true).length;
   return { rate: Math.round((correct / judged.length) * 100), correct, total: judged.length };
 }
 
-function analyzeHitRateCauses(coinId) {
-  const hist = histories[coinId].filter(e => e.wasCorrect !== null && e.wasCorrect !== undefined);
+function analyzeHitRateCauses(stockId) {
+  const hist = histories[stockId].filter(e => e.wasCorrect !== null && e.wasCorrect !== undefined);
   if (hist.length < 2) return [];
-
   const wrong = hist.filter(e => !e.wasCorrect);
   const signals = { BUY: 0, SELL: 0, PARTIAL: 0, HOLD: 0 };
   wrong.forEach(e => signals[e.signal] = (signals[e.signal] || 0) + 1);
-
   const suggestions = [];
   const totalWrong = wrong.length;
-
-  if (signals.BUY / totalWrong > 0.5) {
-    suggestions.push('BUY 신호 오류가 많음 → 상승 과신 경향. 거래량 확인 후 매수 판단 요구 강화 필요');
-  }
-  if (signals.SELL / totalWrong > 0.5 || signals.PARTIAL / totalWrong > 0.5) {
-    suggestions.push('SELL/PARTIAL 신호 오류가 많음 → 하락 과신 경향. 지지선 반등 가능성 더 고려 필요');
-  }
-  if (signals.HOLD / totalWrong > 0.5) {
-    suggestions.push('HOLD 신호 오류가 많음 → 방향성 판단 미흡. 변동성 지표(ATR) 반영 강화 필요');
-  }
-
-  if (suggestions.length === 0) {
-    suggestions.push('특정 패턴 없음 → 시장 변동성이 예측을 어렵게 만든 상황. 더 많은 데이터 축적 필요');
-  }
-
-  suggestions.push('단기 분석 신뢰도 향상을 위해 RSI 과매수/과매도 구간 (30/70 기준) 가중치 증가 권장');
-  suggestions.push('공포&탐욕 지수가 10 이하 또는 90 이상일 때 역발상 전략 적용 고려');
-
+  if (signals.BUY / totalWrong > 0.5) suggestions.push('BUY 신호 오류 과다 → 실적 발표, 섹터 이슈 확인 강화 필요');
+  if ((signals.SELL + signals.PARTIAL) / totalWrong > 0.5) suggestions.push('SELL/PARTIAL 오류 과다 → 지지선 반등 및 시장 전반 흐름 더 반영 필요');
+  if (signals.HOLD / totalWrong > 0.5) suggestions.push('HOLD 오류 과다 → 방향성 판단 미흡. 모멘텀 지표 가중치 증가 권장');
+  if (suggestions.length === 0) suggestions.push('특정 패턴 없음 → 시장 변동성이 예측을 어렵게 만든 상황. 더 많은 데이터 필요');
+  suggestions.push('단기 주가 예측 정확도 향상을 위해 거래량 이상치 감지 로직 강화 권장');
   return suggestions;
 }
 
-// ==================== RENDER COIN GRID ====================
-function renderCoinGrid() {
-  const grid = document.getElementById('coinGrid');
-  grid.innerHTML = COINS.map(c => renderCoinCard(c)).join('');
+// ==================== RENDER STOCK GRID ====================
+function renderStockGrid() {
+  const grid = document.getElementById('stockGrid');
+  grid.innerHTML = STOCKS.map(s => renderStockCard(s)).join('');
 }
 
-function renderCoinCard(coin) {
-  const a = analyses[coin.id];
-  const p = prices[coin.id];
-  const hist = histories[coin.id];
+function renderStockCard(stock) {
+  const a = analyses[stock.id];
+  const p = prices[stock.id];
+  const hist = histories[stock.id];
   const lastEntry = hist.length > 0 ? hist[hist.length - 1] : null;
 
   // Price section
   let priceHtml = '';
   if (p) {
-    const changeSign = p.change24h >= 0 ? '+' : '';
-    const changeClass = p.change24h >= 0 ? 'badge-up' : 'badge-down';
+    const changeSign = p.change >= 0 ? '+' : '';
+    const changeClass = p.change >= 0 ? 'badge-up' : 'badge-down';
 
     let vsPrevHtml = '';
     if (lastEntry && lastEntry.priceKRW) {
@@ -1095,16 +1084,20 @@ function renderCoinCard(coin) {
       vsPrevHtml = `<div class="price-badge ${vsClass}" title="지난 분석 대비">${vsSign}${vsChange.toFixed(2)}% (지난분석비)</div>`;
     }
 
+    const subLine = stock.currency === 'USD'
+      ? `<div class="price-usd">$${p.usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</div>`
+      : '';
+
     priceHtml = `
       <div class="card-price-section">
         <div class="price-row">
           <div class="price-krw">₩${p.krw.toLocaleString()}</div>
           <div class="price-badges">
-            <div class="price-badge ${changeClass}">${changeSign}${p.change24h.toFixed(2)}% (24h)</div>
+            <div class="price-badge ${changeClass}">${changeSign}${p.change.toFixed(2)}% (1d)</div>
             ${vsPrevHtml}
           </div>
         </div>
-        <div class="price-usd">$${p.usd.toLocaleString(undefined, {maximumFractionDigits: 4})}</div>
+        ${subLine}
       </div>`;
   } else {
     priceHtml = `<div class="card-price-section"><div class="price-placeholder">가격 로딩중...</div></div>`;
@@ -1118,7 +1111,6 @@ function renderCoinCard(coin) {
     const s = SIGNAL_MAP[a.signal] || SIGNAL_MAP.HOLD;
     let prevSignalHtml = '';
     if (lastEntry) {
-      const ps = SIGNAL_MAP[lastEntry.signal] || SIGNAL_MAP.HOLD;
       prevSignalHtml = `<div class="prev-signal-badge">
         <span class="prev-label" style="color:var(--text-dim)">이전</span>
         <span class="prev-label" style="color:var(--text-muted)">${lastEntry.signal}</span>
@@ -1170,20 +1162,19 @@ function renderCoinCard(coin) {
     </div>`;
   }
 
-  // Timestamp
   let timestampHtml = '';
   if (a.analyzedAt) {
     timestampHtml = `<div class="card-timestamp">분석시각: ${new Date(a.analyzedAt).toLocaleString('ko-KR')}</div>`;
   }
 
   return `
-    <div class="coin-card" data-coin="${coin.id}" id="card-${coin.id}">
+    <div class="stock-card" data-stock="${stock.id}" id="card-${stock.id}">
       <div class="card-top">
-        <div class="card-coin-info">
-          <div class="card-coin-id">${coin.id}</div>
-          <div class="card-coin-name">${coin.emoji} ${coin.name}</div>
+        <div class="card-stock-info">
+          <div class="card-stock-id">${stock.id === 'COINBASE' ? 'COIN' : stock.id}</div>
+          <div class="card-stock-name">${stock.emoji} ${stock.name}</div>
         </div>
-        <button class="card-analyze-btn" onclick="analyzeCoin('${coin.id}')" id="btn-${coin.id}" ${a.loading ? 'disabled' : ''}>
+        <button class="card-analyze-btn" onclick="analyzeStock('${stock.id}')" id="btn-${stock.id}" ${a.loading ? 'disabled' : ''}>
           ${a.loading ? '분석중...' : '↻ 분석'}
         </button>
       </div>
@@ -1197,9 +1188,9 @@ function renderCoinCard(coin) {
 
 // ==================== RENDER HISTORY TAB ====================
 function renderHistoryTab() {
-  const coinId = activeHistoryCoin;
-  const hist = [...histories[coinId]].reverse().slice(0, 5);
-  const { rate, correct, total } = calcHitRate(coinId);
+  const stockId = activeHistoryStock;
+  const hist = [...histories[stockId]].reverse().slice(0, 5);
+  const { rate, correct, total } = calcHitRate(stockId);
 
   let hitRateHtml = '';
   if (rate !== null) {
@@ -1217,9 +1208,8 @@ function renderHistoryTab() {
           </div>
         </div>
       </div>`;
-
     if (rate < 60) {
-      const causes = analyzeHitRateCauses(coinId);
+      const causes = analyzeHitRateCauses(stockId);
       hitRateHtml += `
         <div class="improvement-box">
           <div class="improvement-title">⚠ 적중률 ${rate}% — 원인 분석 및 개선 방향</div>
@@ -1252,7 +1242,7 @@ function renderHistoryTab() {
         <p>아직 분석 기록이 없습니다.<br>현재 분석 탭에서 분석을 실행하세요.</p>
       </div>`;
   } else {
-    const allHist = histories[coinId];
+    const allHist = histories[stockId];
     entriesHtml = `
       <div class="history-list-header">최근 ${hist.length}개 분석 기록</div>
       <div class="history-entries">
@@ -1261,12 +1251,10 @@ function renderHistoryTab() {
           const timeStr = new Date(entry.timestamp).toLocaleString('ko-KR');
           const s = SIGNAL_MAP[entry.signal] || SIGNAL_MAP.HOLD;
           let correctHtml = '';
-          if (entry.wasCorrect === true)  correctHtml = `<span class="history-correct correct-yes">✓ 적중</span>`;
+          if (entry.wasCorrect === true) correctHtml = `<span class="history-correct correct-yes">✓ 적중</span>`;
           else if (entry.wasCorrect === false) correctHtml = `<span class="history-correct correct-no">✗ 미적중</span>`;
           else correctHtml = `<span class="history-correct correct-pending">평가 대기</span>`;
-
           const priceStr = entry.priceKRW ? `₩${Number(entry.priceKRW).toLocaleString()}` : '—';
-
           return `
             <div class="history-entry">
               <div class="history-entry-header">
@@ -1287,10 +1275,10 @@ function renderHistoryTab() {
   document.getElementById('historyContent').innerHTML = hitRateHtml + entriesHtml;
 }
 
-window.selectHistoryCoin = function(coinId) {
-  activeHistoryCoin = coinId;
-  document.querySelectorAll('.coin-sel-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.coin === coinId);
+window.selectHistoryStock = function(stockId) {
+  activeHistoryStock = stockId;
+  document.querySelectorAll('.stock-sel-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.stock === stockId);
   });
   renderHistoryTab();
 };
@@ -1300,15 +1288,13 @@ window.analyzeAll = async function() {
   const btn = document.getElementById('analyzeAllBtn');
   btn.disabled = true;
   btn.textContent = '▶ 분석중...';
-  showToast('4개 코인 분석 시작', 'success');
+  showToast('5개 종목 분석 시작', 'success');
 
-  // Fetch fresh prices first
   await fetchMarketData();
 
-  // Analyze sequentially with delay to avoid rate limits
-  for (let i = 0; i < COINS.length; i++) {
-    if (i > 0) await new Promise(r => setTimeout(r, 4000)); // 4초 간격
-    await analyzeCoinInternal(COINS[i].id);
+  for (let i = 0; i < STOCKS.length; i++) {
+    if (i > 0) await new Promise(r => setTimeout(r, 4000));
+    await analyzeStockInternal(STOCKS[i].id);
   }
 
   btn.disabled = false;
@@ -1320,21 +1306,21 @@ window.analyzeAll = async function() {
   if (activeTab === 'history') renderHistoryTab();
 };
 
-window.analyzeCoin = async function(coinId) {
+window.analyzeStock = async function(stockId) {
   await fetchMarketData();
-  await analyzeCoinInternal(coinId);
+  await analyzeStockInternal(stockId);
   if (activeTab === 'history') renderHistoryTab();
 };
 
-async function analyzeCoinInternal(coinId) {
-  const coin = COINS.find(c => c.id === coinId);
-  const a = analyses[coinId];
-  const p = prices[coinId];
-  const hist = histories[coinId];
+async function analyzeStockInternal(stockId) {
+  const stock = STOCKS.find(s => s.id === stockId);
+  const a = analyses[stockId];
+  const p = prices[stockId];
+  const hist = histories[stockId];
   const lastEntry = hist.length > 0 ? hist[hist.length - 1] : null;
 
   a.loading = true;
-  renderCoinGrid();
+  renderStockGrid();
 
   const now = new Date();
   const dateStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
@@ -1342,7 +1328,11 @@ async function analyzeCoinInternal(coinId) {
 
   let priceContext = '';
   if (p) {
-    priceContext = `현재가: ₩${p.krw.toLocaleString()} ($${p.usd.toLocaleString()}) | 24h변동: ${p.change24h.toFixed(2)}% | USD/KRW: ${Math.round(usdKrw)}`;
+    if (stock.currency === 'USD') {
+      priceContext = `현재가: $${p.usd.toLocaleString(undefined, { maximumFractionDigits: 2 })} (₩${p.krw.toLocaleString()}) | 1d변동: ${p.change.toFixed(2)}% | USD/KRW: ${Math.round(usdKrw)}`;
+    } else {
+      priceContext = `현재가: ₩${p.krw.toLocaleString()} | 1d변동: ${p.change.toFixed(2)}%`;
+    }
   } else {
     priceContext = '가격 정보 없음 (최신 시장 데이터 기반으로 추정 분석)';
   }
@@ -1364,32 +1354,34 @@ async function analyzeCoinInternal(coinId) {
 이전 의견 적중 여부: ${wasCorrect === null ? '판단 불가' : wasCorrect ? '✓ 적중' : '✗ 미적중'}`;
   }
 
-  const prompt = `당신은 경험 많은 암호화폐 투자 분석가입니다.
+  const supportCurrency = stock.currency === 'KRW' ? '원화' : '달러';
+
+  const prompt = `당신은 경험 많은 주식 투자 분석가입니다.
 
 분석 일시: ${dateStr} ${timeStr}
-코인: ${coin.name} (${coin.id})
+종목: ${stock.name} (${stock.symbol})
 ${priceContext}
 ${prevContext}
 
 다음 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만:
 {
   "signal": "BUY" | "HOLD" | "PARTIAL" | "SELL",
-  "analysis": "현재 시장 상황, 기술적 지표 흐름, 최근 뉴스 감성을 종합한 투자 근거 2-3문장. 구체적 수치 포함.",
+  "analysis": "현재 시장 상황, 기술적 지표 흐름, 최근 뉴스 및 실적 감성을 종합한 투자 근거 2-3문장. 구체적 수치 포함.",
   "prevComment": ${lastEntry ? '"이전 분석의 적중 여부와 시장 변화 이유를 1-2문장으로. 이전 의견이 맞았는지, 왜 맞거나 틀렸는지 간략히."' : 'null'},
   "indicators": {
     "rsi": RSI 추정값 (숫자, 0-100),
     "trend": "상승" | "중립" | "하락",
     "volume": "증가" | "보통" | "감소",
     "sentiment": "긍정" | "중립" | "부정",
-    "support": "주요 지지선 가격대 (원화 기준 문자열)"
+    "support": "주요 지지선 가격대 (${supportCurrency} 기준 문자열)"
   }
 }
 
 signal 기준:
-- BUY: 기술지표 강세 + 감성 긍정 → 추가 매수 적기
+- BUY: 기술지표 강세 + 실적/뉴스 긍정 → 매수 적기
 - HOLD: 방향 불명확 → 현 포지션 유지
 - PARTIAL: 일부 리스크 헤지 필요 → 분할 매도 권장
-- SELL: 하락 신호 명확 → 전량 매도 검토`;
+- SELL: 하락 신호 명확 또는 실적 우려 → 매도 검토`;
 
   try {
     const response = await fetch('/.netlify/functions/analyze', {
@@ -1414,12 +1406,10 @@ signal 기준:
 
     const parsed = JSON.parse(jsonMatch[0]);
 
-    // Update previous entry's wasCorrect
     if (lastEntry && prevSignalWasCorrect !== null) {
       hist[hist.length - 1].wasCorrect = prevSignalWasCorrect;
     }
 
-    // Build new history entry
     const newEntry = {
       timestamp: now.toISOString(),
       signal: parsed.signal,
@@ -1430,11 +1420,9 @@ signal 기준:
       wasCorrect: null,
     };
 
-    // Keep last 10 entries
     hist.push(newEntry);
     if (hist.length > 10) hist.splice(0, hist.length - 10);
 
-    // Update analysis state
     a.signal = parsed.signal;
     a.analysis = parsed.analysis;
     a.prevComment = parsed.prevComment || null;
@@ -1443,17 +1431,17 @@ signal 기준:
     a.priceKRW = p ? p.krw : null;
     a.priceUSD = p ? p.usd : null;
 
-    await saveHistory(coinId);
+    await saveHistory(stockId);
 
   } catch(e) {
     a.signal = 'HOLD';
     a.analysis = `분석 오류: ${e.message || '재시도해주세요.'}`;
     a.prevComment = null;
-    showToast(`${coinId} 분석 실패: ${e.message}`, 'error');
+    showToast(`${stockId} 분석 실패: ${e.message}`, 'error');
   }
 
   a.loading = false;
-  renderCoinGrid();
+  renderStockGrid();
 }
 
 // ==================== TOAST ====================
@@ -1474,7 +1462,7 @@ function showToast(msg, type) { window.showToast(msg, type); }
 // ==================== INIT ====================
 async function init() {
   showToast('데이터 로딩중...', '');
-  renderCoinGrid();
+  renderStockGrid();
   await loadHistories();
   await fetchMarketData();
   showToast('준비 완료 ✓', 'success');
