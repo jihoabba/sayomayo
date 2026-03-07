@@ -732,9 +732,27 @@
   </div>
 </main>
 
-<script>
+<script type="module">
+// ==================== FIREBASE ====================
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCRg5Ql00zUVYkUqO9Li7x5TdAP8UnoKaA",
+  authDomain: "sayomayo-ee086.firebaseapp.com",
+  projectId: "sayomayo-ee086",
+  storageBucket: "sayomayo-ee086.firebasestorage.app",
+  messagingSenderId: "346728523108",
+  appId: "1:346728523108:web:02202e3ee22f95443d4671"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const COLLECTION = 'portfolio';
+
 // ==================== STATE ====================
-let portfolio = JSON.parse(localStorage.getItem('signal_portfolio') || '[]');
+let portfolio = [];
+let portfolio = [];
 
 // ==================== TIME ====================
 function updateTime() {
@@ -784,19 +802,45 @@ async function fetchMarketOverview() {
 fetchMarketOverview();
 
 // ==================== PORTFOLIO MANAGEMENT ====================
-function savePortfolio() {
-  // Save only non-analysis data
-  const toSave = portfolio.map(p => ({
-    id: p.id,
-    ticker: p.ticker,
-    type: p.type,
-    currency: p.currency,
-    avgPrice: p.avgPrice,
-  }));
-  localStorage.setItem('signal_portfolio', JSON.stringify(toSave));
+async function savePortfolio() {
+  // Save only stable data to Firestore
+  for (const p of portfolio) {
+    await setDoc(doc(db, COLLECTION, String(p.id)), {
+      id: p.id,
+      ticker: p.ticker,
+      type: p.type,
+      currency: p.currency,
+      avgPrice: p.avgPrice || null,
+      name: p.name || null,
+    });
+  }
 }
 
-function addTicker() {
+async function saveItem(item) {
+  await setDoc(doc(db, COLLECTION, String(item.id)), {
+    id: item.id,
+    ticker: item.ticker,
+    type: item.type,
+    currency: item.currency,
+    avgPrice: item.avgPrice || null,
+    name: item.name || null,
+  });
+}
+
+async function deleteItem(id) {
+  await deleteDoc(doc(db, COLLECTION, String(id)));
+}
+
+async function loadPortfolio() {
+  const snapshot = await getDocs(collection(db, COLLECTION));
+  portfolio = snapshot.docs.map(d => ({
+    ...d.data(),
+    price: null, change: null, signal: null, analysis: null, indicators: null, loading: false
+  }));
+  renderPortfolio();
+}
+
+async function addTicker() {
   const type = document.getElementById('assetType').value;
   const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
   const avgPrice = parseFloat(document.getElementById('avgPriceInput').value) || null;
@@ -822,7 +866,7 @@ function addTicker() {
   };
 
   portfolio.push(item);
-  savePortfolio();
+  await saveItem(item);
   renderPortfolio();
 
   document.getElementById('tickerInput').value = '';
@@ -833,9 +877,9 @@ function addTicker() {
   analyzeItem(item.id);
 }
 
-function removeTicker(id) {
+async function removeTicker(id) {
   portfolio = portfolio.filter(p => p.id !== id);
-  savePortfolio();
+  await deleteItem(id);
   renderPortfolio();
 }
 
@@ -1086,7 +1130,7 @@ signal 기준:
 
   item.loading = false;
   updateCard(id);
-  savePortfolio();
+  await saveItem(item);
 }
 
 // ==================== TOAST ====================
@@ -1104,11 +1148,17 @@ function showToast(msg, type = '') {
   toastTimer = setTimeout(() => el.remove(), 3000);
 }
 
+// ==================== GLOBAL WRAPPERS (module scope fix) ====================
+window.addTicker = addTicker;
+window.analyzeAll = analyzeAll;
+window.analyzeItem = analyzeItem;
+window.removeTicker = removeTicker;
+
 // ==================== INIT ====================
-function init() {
-  // Restore portfolio without analysis (need to re-analyze)
-  portfolio = portfolio.map(p => ({ ...p, signal: null, analysis: null, indicators: null, loading: false }));
-  renderPortfolio();
+async function init() {
+  showToast('Firebase 연결중...', '');
+  await loadPortfolio();
+  showToast('종목 불러옴 ✓', 'success');
 
   // Auto-set currency based on type
   document.getElementById('assetType').addEventListener('change', (e) => {
