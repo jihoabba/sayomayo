@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SAYOMAYO — 투자 의견 대시보드</title>
+<title>COIN SAYOMAYO</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -16,7 +16,6 @@
     --text-dim: #3a3a5a;
     --accent: #00ff88;
     --accent-dim: rgba(0,255,136,0.1);
-    --accent-glow: rgba(0,255,136,0.2);
     --warn: #ff6b35;
     --warn-dim: rgba(255,107,53,0.1);
     --danger: #ff3366;
@@ -25,6 +24,10 @@
     --hold-dim: rgba(255,215,0,0.1);
     --up: #00ff88;
     --down: #ff3366;
+    --btc-color: #f7931a;
+    --eth-color: #627eea;
+    --xrp-color: #00aae4;
+    --sol-color: #9945ff;
   }
 
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,7 +41,6 @@
     overflow-x: hidden;
   }
 
-  /* Noise texture overlay */
   body::before {
     content: '';
     position: fixed;
@@ -51,18 +53,18 @@
   .container {
     position: relative;
     z-index: 1;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 0 24px;
   }
 
-  /* Header */
+  /* ── Header ── */
   header {
     border-bottom: 1px solid var(--border);
-    padding: 20px 0;
+    padding: 18px 0;
     position: sticky;
     top: 0;
-    background: rgba(10,10,15,0.92);
+    background: rgba(10,10,15,0.95);
     backdrop-filter: blur(20px);
     z-index: 100;
   }
@@ -76,363 +78,352 @@
   .logo {
     font-family: 'Syne', sans-serif;
     font-weight: 800;
-    font-size: 22px;
-    letter-spacing: -0.5px;
+    font-size: 20px;
+    letter-spacing: 1px;
     color: var(--text);
   }
 
-  .logo span {
-    color: var(--accent);
-  }
+  .logo .coin { color: var(--btc-color); }
+  .logo .dot { color: var(--accent); }
 
   .header-meta {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--text-muted);
   }
 
   .live-dot {
-    width: 6px;
-    height: 6px;
+    width: 6px; height: 6px;
     border-radius: 50%;
     background: var(--accent);
     animation: pulse 2s infinite;
     display: inline-block;
-    margin-right: 6px;
+    margin-right: 5px;
   }
 
   @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
+    0%,100% { opacity:1; transform:scale(1); }
+    50% { opacity:0.4; transform:scale(0.8); }
   }
 
-  /* Main layout */
-  main {
-    padding: 40px 0 80px;
-  }
+  /* ── Main ── */
+  main { padding: 32px 0 80px; }
 
-  /* Add ticker section */
-  .add-section {
-    margin-bottom: 40px;
-    padding: 28px 32px;
+  /* ── Market Bar ── */
+  .market-bar {
+    margin-bottom: 28px;
+    padding: 12px 20px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 2px;
-    position: relative;
-    overflow: hidden;
+    display: flex;
+    gap: 28px;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 
-  .add-section::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 3px; height: 100%;
-    background: var(--accent);
+  .market-bar::-webkit-scrollbar { display: none; }
+
+  .market-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
 
-  .add-section h2 {
-    font-family: 'Syne', sans-serif;
+  .market-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .market-value {
+    font-family: 'DM Mono', monospace;
     font-size: 13px;
+    color: var(--text);
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-muted);
+    font-family: 'Syne', sans-serif;
     font-weight: 600;
+    font-size: 11px;
     letter-spacing: 3px;
     text-transform: uppercase;
-    color: var(--text-muted);
+    padding: 12px 24px;
+    cursor: pointer;
+    margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover { color: var(--text); }
+
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* ── Action Bar ── */
+  .action-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 20px;
   }
 
-  .input-row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: flex-end;
-  }
-
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .input-group label {
+  .action-bar-left {
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
+    font-size: 11px;
     color: var(--text-dim);
   }
 
-  .input-group select,
-  .input-group input {
-    background: var(--bg);
-    border: 1px solid var(--border-light);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    padding: 10px 14px;
-    outline: none;
-    border-radius: 1px;
-    transition: border-color 0.2s;
-    min-width: 130px;
-  }
-
-  .input-group input::placeholder { color: var(--text-dim); }
-
-  .input-group select:focus,
-  .input-group input:focus {
-    border-color: var(--accent);
-  }
-
-  .input-group select option {
-    background: #111;
-  }
-
-  .input-group.ticker-input input {
-    min-width: 160px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-
-  .avg-price-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .avg-price-group label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-  }
-
-  .avg-price-group input {
-    background: var(--bg);
-    border: 1px solid var(--border-light);
-    color: var(--text);
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    padding: 10px 14px;
-    outline: none;
-    border-radius: 1px;
-    min-width: 130px;
-    transition: border-color 0.2s;
-  }
-
-  .avg-price-group input:focus {
-    border-color: var(--accent);
-  }
-
-  .btn-add {
+  .btn-analyze-all {
     background: var(--accent);
     color: #000;
     border: none;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 11px 24px;
-    cursor: pointer;
-    border-radius: 1px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn-add:hover { background: #00cc6e; transform: translateY(-1px); }
-  .btn-add:active { transform: translateY(0); }
-
-  .btn-analyze-all {
-    background: transparent;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 11px 24px;
-    cursor: pointer;
-    border-radius: 1px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .btn-analyze-all:hover {
-    background: var(--accent-dim);
-  }
-
-  /* Portfolio grid */
-  .portfolio-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .portfolio-header h2 {
-    font-family: 'Syne', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  .portfolio-count {
-    font-family: 'DM Mono', monospace;
     font-size: 11px;
-    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 24px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.2s;
   }
 
-  .portfolio-grid {
+  .btn-analyze-all:hover { background: #00cc6e; transform: translateY(-1px); }
+  .btn-analyze-all:disabled { background: var(--border-light); color: var(--text-dim); cursor: not-allowed; transform: none; }
+
+  /* ── Coin Grid ── */
+  .coin-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 16px;
   }
 
-  /* Stock card */
-  .stock-card {
+  /* ── Coin Card ── */
+  .coin-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 2px;
     overflow: hidden;
     transition: border-color 0.3s, transform 0.2s;
-    animation: slideIn 0.3s ease;
   }
 
-  @keyframes slideIn {
-    from { opacity: 0; transform: translateY(16px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
+  .coin-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
 
-  .stock-card:hover { border-color: var(--border-light); transform: translateY(-2px); }
+  .coin-card[data-coin="BTC"] { --coin-color: var(--btc-color); }
+  .coin-card[data-coin="ETH"] { --coin-color: var(--eth-color); }
+  .coin-card[data-coin="XRP"] { --coin-color: var(--xrp-color); }
+  .coin-card[data-coin="SOL"] { --coin-color: var(--sol-color); }
 
-  .card-header {
-    padding: 20px 20px 16px;
+  .card-top {
+    padding: 16px 20px 14px;
     border-bottom: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    position: relative;
+    overflow: hidden;
   }
 
-  .card-ticker {
+  .card-top::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--coin-color);
+  }
+
+  .card-coin-info { padding-left: 6px; }
+
+  .card-coin-id {
     font-family: 'Syne', sans-serif;
     font-size: 20px;
     font-weight: 800;
+    color: var(--coin-color);
     letter-spacing: -0.5px;
-    color: var(--text);
   }
 
-  .card-name {
+  .card-coin-name {
     font-size: 11px;
     color: var(--text-muted);
-    margin-top: 3px;
+    margin-top: 2px;
   }
 
-  .card-type-badge {
+  .card-analyze-btn {
+    background: transparent;
+    border: 1px solid var(--border-light);
+    color: var(--text-muted);
     font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 3px 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 5px 12px;
+    cursor: pointer;
     border-radius: 1px;
+    transition: all 0.2s;
+    white-space: nowrap;
+    align-self: flex-start;
   }
 
-  .type-us { background: rgba(100,150,255,0.15); color: #6496ff; border: 1px solid rgba(100,150,255,0.3); }
-  .type-kr { background: rgba(255,100,100,0.15); color: #ff6464; border: 1px solid rgba(255,100,100,0.3); }
-  .type-crypto { background: rgba(255,165,0,0.15); color: #ffaa00; border: 1px solid rgba(255,165,0,0.3); }
-  .type-etf { background: rgba(150,100,255,0.15); color: #aa64ff; border: 1px solid rgba(150,100,255,0.3); }
+  .card-analyze-btn:hover { border-color: var(--coin-color); color: var(--coin-color); }
+  .card-analyze-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  .card-price-row {
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+  /* Price section */
+  .card-price-section {
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
   }
 
-  .price-main {
+  .price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .price-krw {
     font-family: 'DM Mono', monospace;
     font-size: 22px;
     font-weight: 500;
     color: var(--text);
+    letter-spacing: -0.5px;
   }
 
-  .price-change {
+  .price-badges {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .price-badge {
     font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    padding: 3px 8px;
+    font-size: 11px;
+    padding: 2px 8px;
     border-radius: 1px;
   }
 
-  .price-up { color: var(--up); background: rgba(0,255,136,0.08); }
-  .price-down { color: var(--down); background: rgba(255,51,102,0.08); }
+  .badge-up { color: var(--up); background: rgba(0,255,136,0.08); }
+  .badge-down { color: var(--down); background: rgba(255,51,102,0.08); }
+  .badge-neutral { color: var(--text-muted); background: rgba(100,100,160,0.08); }
 
-  .avg-display {
+  .price-usd {
     font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--text-muted);
-    padding: 0 20px 12px;
-    display: flex;
-    gap: 20px;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
   }
 
-  .avg-display span { color: var(--text-dim); margin-right: 4px; }
+  .price-placeholder {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 8px 0;
+  }
 
-  /* Signal badge */
-  .signal-area {
-    padding: 16px 20px;
+  /* Signal */
+  .card-signal-section {
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
   }
 
   .signal-badge {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
+    gap: 7px;
+    padding: 5px 12px;
     border-radius: 1px;
     font-family: 'Syne', sans-serif;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 
-  .signal-buy { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
-  .signal-hold { background: var(--hold-dim); color: var(--hold); border: 1px solid rgba(255,215,0,0.3); }
-  .signal-partial { background: var(--warn-dim); color: var(--warn); border: 1px solid rgba(255,107,53,0.3); }
-  .signal-sell { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(255,51,102,0.3); }
-  .signal-loading { background: rgba(100,100,150,0.1); color: var(--text-muted); border: 1px solid var(--border-light); }
+  .signal-dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
 
-  .signal-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: currentColor;
+  .sig-buy   { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,255,136,0.3); }
+  .sig-hold  { background: var(--hold-dim);   color: var(--hold);   border: 1px solid rgba(255,215,0,0.3); }
+  .sig-partial { background: var(--warn-dim); color: var(--warn);   border: 1px solid rgba(255,107,53,0.3); }
+  .sig-sell  { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(255,51,102,0.3); }
+  .sig-loading { background: rgba(100,100,150,0.1); color: var(--text-muted); border: 1px solid var(--border-light); }
+
+  .prev-signal-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
   }
 
-  /* Analysis text */
-  .analysis-text {
-    padding: 14px 20px 16px;
-    font-size: 12px;
-    line-height: 1.7;
-    color: var(--text-muted);
+  .prev-signal-badge .prev-label { text-transform: uppercase; letter-spacing: 1px; }
+  .prev-signal-badge .prev-arrow { color: var(--text-muted); }
+
+  /* Analysis */
+  .card-analysis-section {
+    padding: 14px 20px;
     border-bottom: 1px solid var(--border);
     min-height: 80px;
   }
 
-  .analysis-text.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .analysis-main {
+    font-size: 12px;
+    line-height: 1.75;
+    color: var(--text-muted);
+  }
+
+  .analysis-prev-comment {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(100,100,160,0.06);
+    border-left: 2px solid var(--border-light);
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .analysis-prev-comment .prev-comment-label {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 4px;
   }
 
   .typing-indicator {
     display: flex;
     gap: 4px;
     align-items: center;
+    padding: 12px 0;
   }
 
   .typing-indicator span {
@@ -446,25 +437,22 @@
   .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
   @keyframes typing {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+    0%,60%,100% { transform: translateY(0); opacity: 0.4; }
     30% { transform: translateY(-4px); opacity: 1; }
   }
 
   /* Indicators */
-  .indicators {
+  .card-indicators {
     padding: 12px 20px;
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
   }
 
-  .indicator-item {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
+  .ind-item { display: flex; flex-direction: column; gap: 2px; }
 
-  .indicator-label {
+  .ind-label {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
     letter-spacing: 1.5px;
@@ -472,100 +460,89 @@
     color: var(--text-dim);
   }
 
-  .indicator-value {
+  .ind-value {
     font-family: 'DM Mono', monospace;
     font-size: 12px;
     color: var(--text-muted);
   }
 
-  .indicator-value.bullish { color: var(--up); }
-  .indicator-value.bearish { color: var(--down); }
-  .indicator-value.neutral { color: var(--hold); }
+  .ind-value.bullish { color: var(--up); }
+  .ind-value.bearish { color: var(--down); }
+  .ind-value.neutral { color: var(--hold); }
 
-  /* Card actions */
-  .card-actions {
-    padding: 12px 20px;
+  .card-timestamp {
+    padding: 8px 20px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+  }
+
+  /* ── History Tab ── */
+  .history-section { }
+
+  .coin-selector {
     display: flex;
     gap: 8px;
-    justify-content: flex-end;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
   }
 
-  .btn-refresh {
+  .coin-sel-btn {
     background: transparent;
     border: 1px solid var(--border-light);
     color: var(--text-muted);
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 1px;
-    transition: all 0.2s;
-  }
-
-  .btn-refresh:hover { border-color: var(--accent); color: var(--accent); }
-
-  .btn-remove {
-    background: transparent;
-    border: 1px solid var(--border-light);
-    color: var(--text-dim);
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 1px;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 1px;
-    transition: all 0.2s;
-  }
-
-  .btn-remove:hover { border-color: var(--danger); color: var(--danger); }
-
-  /* Empty state */
-  .empty-state {
-    text-align: center;
-    padding: 80px 40px;
-    color: var(--text-dim);
-  }
-
-  .empty-state .icon {
-    font-size: 40px;
-    margin-bottom: 20px;
-    opacity: 0.3;
-  }
-
-  .empty-state h3 {
     font-family: 'Syne', sans-serif;
-    font-size: 16px;
     font-weight: 700;
-    color: var(--text-muted);
-    margin-bottom: 8px;
+    font-size: 11px;
+    letter-spacing: 2px;
+    padding: 7px 18px;
+    cursor: pointer;
+    border-radius: 1px;
+    transition: all 0.2s;
   }
 
-  .empty-state p {
-    font-size: 13px;
-    line-height: 1.6;
-  }
+  .coin-sel-btn:hover { color: var(--text); border-color: var(--text-muted); }
 
-  /* Market status bar */
-  .market-bar {
-    margin-bottom: 32px;
-    padding: 14px 20px;
+  .coin-sel-btn.active[data-coin="BTC"] { color: var(--btc-color); border-color: var(--btc-color); background: rgba(247,147,26,0.08); }
+  .coin-sel-btn.active[data-coin="ETH"] { color: var(--eth-color); border-color: var(--eth-color); background: rgba(98,126,234,0.08); }
+  .coin-sel-btn.active[data-coin="XRP"] { color: var(--xrp-color); border-color: var(--xrp-color); background: rgba(0,174,228,0.08); }
+  .coin-sel-btn.active[data-coin="SOL"] { color: var(--sol-color); border-color: var(--sol-color); background: rgba(153,69,255,0.08); }
+
+  /* Hit Rate */
+  .hit-rate-box {
+    padding: 20px 24px;
     background: var(--surface);
     border: 1px solid var(--border);
-    display: flex;
-    gap: 32px;
-    overflow-x: auto;
     border-radius: 2px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
   }
 
-  .market-item {
+  .hit-rate-left { display: flex; align-items: center; gap: 20px; }
+
+  .hit-rate-number {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 1;
+  }
+
+  .hit-rate-number.good { color: var(--accent); }
+  .hit-rate-number.warn { color: var(--hold); }
+  .hit-rate-number.bad  { color: var(--danger); }
+
+  .hit-rate-info {
     display: flex;
     flex-direction: column;
-    gap: 3px;
-    white-space: nowrap;
+    gap: 4px;
   }
 
-  .market-item-label {
+  .hit-rate-label {
     font-family: 'DM Mono', monospace;
     font-size: 9px;
     letter-spacing: 2px;
@@ -573,10 +550,163 @@
     color: var(--text-dim);
   }
 
-  .market-item-value {
+  .hit-rate-sub {
     font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    color: var(--text);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .hit-rate-bar {
+    width: 160px;
+    height: 4px;
+    background: var(--border-light);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .hit-rate-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .hit-rate-bar-fill.good { background: var(--accent); }
+  .hit-rate-bar-fill.warn { background: var(--hold); }
+  .hit-rate-bar-fill.bad  { background: var(--danger); }
+
+  /* Improvement box */
+  .improvement-box {
+    padding: 16px 20px;
+    background: var(--danger-dim);
+    border: 1px solid rgba(255,51,102,0.2);
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+
+  .improvement-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--danger);
+    margin-bottom: 10px;
+  }
+
+  .improvement-body {
+    font-size: 12px;
+    line-height: 1.7;
+    color: var(--text-muted);
+  }
+
+  .improvement-list {
+    margin: 8px 0 0 4px;
+    padding-left: 12px;
+    list-style: none;
+  }
+
+  .improvement-list li {
+    position: relative;
+    padding-left: 12px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .improvement-list li::before {
+    content: '→';
+    position: absolute;
+    left: -4px;
+    color: var(--danger);
+    font-size: 10px;
+  }
+
+  /* History list */
+  .history-list-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .history-entries { display: flex; flex-direction: column; gap: 10px; }
+
+  .history-entry {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .history-entry:hover { border-color: var(--border-light); }
+
+  .history-entry-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .history-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    min-width: 24px;
+  }
+
+  .history-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    flex: 1;
+  }
+
+  .history-price-info {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .history-correct {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 1px;
+  }
+
+  .correct-yes { color: var(--up); background: rgba(0,255,136,0.08); }
+  .correct-no  { color: var(--down); background: rgba(255,51,102,0.08); }
+  .correct-pending { color: var(--text-dim); background: rgba(100,100,150,0.08); }
+
+  .history-entry-body {
+    padding: 12px 16px;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--text-muted);
+  }
+
+  .history-no-data {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+
+  .history-no-data .icon { font-size: 32px; margin-bottom: 12px; opacity: 0.3; }
+
+  .history-no-data p {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
   }
 
   /* Toast */
@@ -587,27 +717,27 @@
     background: var(--surface);
     border: 1px solid var(--border-light);
     color: var(--text);
-    padding: 12px 20px;
+    padding: 11px 18px;
     font-size: 12px;
     font-family: 'DM Mono', monospace;
     border-radius: 2px;
     z-index: 1000;
     animation: toastIn 0.3s ease;
-    max-width: 320px;
+    max-width: 300px;
   }
 
   @keyframes toastIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { opacity:0; transform:translateY(8px); }
+    to   { opacity:1; transform:translateY(0); }
   }
 
-  .toast.error { border-color: var(--danger); color: var(--danger); }
+  .toast.error   { border-color: var(--danger); color: var(--danger); }
   .toast.success { border-color: var(--accent); color: var(--accent); }
 
   /* Disclaimer */
   .disclaimer {
     margin-top: 48px;
-    padding: 16px 20px;
+    padding: 14px 18px;
     border: 1px solid var(--border);
     font-family: 'DM Mono', monospace;
     font-size: 10px;
@@ -627,11 +757,10 @@
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 2px; }
 
-  @media (max-width: 600px) {
-    .portfolio-grid { grid-template-columns: 1fr; }
-    .input-row { gap: 10px; }
-    .market-bar { gap: 20px; }
-    .add-section { padding: 20px; }
+  @media (max-width: 650px) {
+    .coin-grid { grid-template-columns: 1fr; }
+    .hit-rate-box { flex-direction: column; align-items: flex-start; }
+    .price-krw { font-size: 18px; }
   }
 </style>
 </head>
@@ -639,9 +768,9 @@
 
 <header>
   <div class="container">
-    <div class="logo">SAYOMAYO<span>.</span></div>
+    <div class="logo"><span class="coin">COIN</span> SAYOMAYO<span class="dot">.</span></div>
     <div class="header-meta">
-      <span><span class="live-dot"></span>AI 투자의견</span>
+      <span><span class="live-dot"></span>AI 코인 분석</span>
       <span id="currentTime">--:--:--</span>
     </div>
   </div>
@@ -650,78 +779,63 @@
 <main>
   <div class="container">
 
-    <!-- Market Overview Bar -->
-    <div class="market-bar" id="marketBar">
+    <!-- Market Bar -->
+    <div class="market-bar">
       <div class="market-item">
-        <div class="market-item-label">KOSPI</div>
-        <div class="market-item-value" id="kospi">로딩중...</div>
+        <div class="market-label">BTC/KRW</div>
+        <div class="market-value" id="mb-btc">—</div>
       </div>
       <div class="market-item">
-        <div class="market-item-label">NASDAQ</div>
-        <div class="market-item-value" id="nasdaq">로딩중...</div>
+        <div class="market-label">ETH/KRW</div>
+        <div class="market-value" id="mb-eth">—</div>
       </div>
       <div class="market-item">
-        <div class="market-item-label">S&P 500</div>
-        <div class="market-item-value" id="sp500">로딩중...</div>
+        <div class="market-label">XRP/KRW</div>
+        <div class="market-value" id="mb-xrp">—</div>
       </div>
       <div class="market-item">
-        <div class="market-item-label">BTC/USD</div>
-        <div class="market-item-value" id="btcusd">로딩중...</div>
+        <div class="market-label">SOL/KRW</div>
+        <div class="market-value" id="mb-sol">—</div>
       </div>
       <div class="market-item">
-        <div class="market-item-label">USD/KRW</div>
-        <div class="market-item-value" id="usdkrw">로딩중...</div>
+        <div class="market-label">USD/KRW</div>
+        <div class="market-value" id="mb-usdkrw">—</div>
       </div>
       <div class="market-item">
-        <div class="market-item-label">공포&탐욕</div>
-        <div class="market-item-value" id="feargreed">로딩중...</div>
+        <div class="market-label">공포&탐욕</div>
+        <div class="market-value" id="mb-fg">—</div>
       </div>
     </div>
 
-    <!-- Add Ticker -->
-    <div class="add-section">
-      <h2>종목 추가</h2>
-      <div class="input-row">
-        <div class="input-group">
-          <label>종목 유형</label>
-          <select id="assetType">
-            <option value="US">🇺🇸 미국주식</option>
-            <option value="KR">🇰🇷 국내주식</option>
-            <option value="CRYPTO">₿ 암호화폐</option>
-            <option value="ETF">📊 ETF</option>
-          </select>
-        </div>
-        <div class="input-group ticker-input">
-          <label>티커 심볼</label>
-          <input type="text" id="tickerInput" placeholder="AAPL / 005930 / BTC" />
-        </div>
-        <div class="avg-price-group">
-          <label>평균 매수가 (선택)</label>
-          <input type="number" id="avgPriceInput" placeholder="0" step="any" />
-        </div>
-        <div class="input-group">
-          <label>통화</label>
-          <select id="currency">
-            <option value="USD">USD</option>
-            <option value="KRW">KRW</option>
-          </select>
-        </div>
-        <button class="btn-add" onclick="addTicker()">+ 추가</button>
-        <button class="btn-analyze-all" onclick="analyzeAll()">전체 분석</button>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('current')">현재 분석</button>
+      <button class="tab-btn" onclick="switchTab('history')">지난 의견</button>
+    </div>
+
+    <!-- Current Analysis Tab -->
+    <div class="tab-content active" id="tab-current">
+      <div class="action-bar">
+        <div class="action-bar-left" id="lastAnalyzedTime">아직 분석하지 않았습니다</div>
+        <button class="btn-analyze-all" id="analyzeAllBtn" onclick="analyzeAll()">▶ 전체 분석</button>
+      </div>
+
+      <div class="coin-grid" id="coinGrid">
+        <!-- Cards injected by JS -->
       </div>
     </div>
 
-    <!-- Portfolio -->
-    <div class="portfolio-header">
-      <h2>포트폴리오</h2>
-      <span class="portfolio-count" id="portfolioCount">0개 종목</span>
-    </div>
+    <!-- History Tab -->
+    <div class="tab-content" id="tab-history">
+      <div class="coin-selector" id="coinSelector">
+        <button class="coin-sel-btn active" data-coin="BTC" onclick="selectHistoryCoin('BTC')">BTC</button>
+        <button class="coin-sel-btn" data-coin="ETH" onclick="selectHistoryCoin('ETH')">ETH</button>
+        <button class="coin-sel-btn" data-coin="XRP" onclick="selectHistoryCoin('XRP')">XRP</button>
+        <button class="coin-sel-btn" data-coin="SOL" onclick="selectHistoryCoin('SOL')">SOL</button>
+      </div>
 
-    <div class="portfolio-grid" id="portfolioGrid">
-      <div class="empty-state" id="emptyState">
-        <div class="icon">◈</div>
-        <h3>종목을 추가해보세요</h3>
-        <p>위에서 티커를 입력하면<br>AI가 실시간으로 투자 의견을 분석합니다</p>
+      <div id="historyContent">
+        <!-- Injected by JS -->
       </div>
     </div>
 
@@ -734,12 +848,11 @@
 
 <script type="module">
 // ==================== CONFIG ====================
-// ⚠️ 새 키를 발급받은 후 아래에 입력하세요 (기존 노출된 키는 폐기할 것)
-const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';
+const ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE'; // ⚠️ 실제 키로 교체하세요
 
 // ==================== FIREBASE ====================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, doc, setDoc, deleteDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyCRg5Ql00zUVYkUqO9Li7x5TdAP8UnoKaA",
@@ -752,354 +865,495 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const COLLECTION = 'portfolio';
+const HISTORY_COLLECTION = 'coin_history';
+
+// ==================== CONSTANTS ====================
+const COINS = [
+  { id: 'BTC', name: '비트코인',  geckoId: 'bitcoin',  emoji: '₿' },
+  { id: 'ETH', name: '이더리움',  geckoId: 'ethereum', emoji: 'Ξ' },
+  { id: 'XRP', name: '리플',      geckoId: 'ripple',   emoji: '✕' },
+  { id: 'SOL', name: '솔라나',    geckoId: 'solana',   emoji: '◎' },
+];
+
+const SIGNAL_MAP = {
+  BUY:     { cls: 'sig-buy',     label: '▲ 추가 매수' },
+  HOLD:    { cls: 'sig-hold',    label: '◼ 보류' },
+  PARTIAL: { cls: 'sig-partial', label: '▽ 분할 매도' },
+  SELL:    { cls: 'sig-sell',    label: '▼ 전량 매도' },
+};
 
 // ==================== STATE ====================
-let portfolio = [];
+let usdKrw = 1350;
+let prices = {};   // { BTC: { usd, krw, change24h } }
+let analyses = {}; // { BTC: { loading, signal, analysis, indicators, analyzedAt, priceKRW, priceUSD, prevComment } }
+let histories = {}; // { BTC: [ ...entries ] }
+let activeHistoryCoin = 'BTC';
+let activeTab = 'current';
+
+// Init state
+COINS.forEach(c => {
+  analyses[c.id] = { loading: false, signal: null, analysis: null, indicators: null, analyzedAt: null, priceKRW: null, priceUSD: null, prevComment: null };
+  histories[c.id] = [];
+});
 
 // ==================== TIME ====================
 function updateTime() {
-  const now = new Date();
   document.getElementById('currentTime').textContent =
-    now.toLocaleTimeString('ko-KR', { hour12: false });
+    new Date().toLocaleTimeString('ko-KR', { hour12: false });
 }
 setInterval(updateTime, 1000);
 updateTime();
 
+// ==================== TAB ====================
+window.switchTab = function(tab) {
+  activeTab = tab;
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', (i === 0 && tab === 'current') || (i === 1 && tab === 'history'));
+  });
+  document.getElementById('tab-current').classList.toggle('active', tab === 'current');
+  document.getElementById('tab-history').classList.toggle('active', tab === 'history');
+  if (tab === 'history') renderHistoryTab();
+};
+
 // ==================== MARKET OVERVIEW ====================
-async function fetchMarketOverview() {
-  // Crypto Fear & Greed
+async function fetchMarketData() {
+  // USD/KRW
   try {
-    const fg = await fetch('https://api.alternative.me/fng/?limit=1');
-    const fgData = await fg.json();
-    const val = fgData.data[0].value;
-    const label = fgData.data[0].value_classification;
-    const el = document.getElementById('feargreed');
+    const r = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const d = await r.json();
+    usdKrw = d.rates.KRW;
+    document.getElementById('mb-usdkrw').textContent = Math.round(usdKrw).toLocaleString() + '원';
+  } catch(e) {}
+
+  // Coin prices
+  try {
+    const ids = COINS.map(c => c.geckoId).join(',');
+    const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd&include_24hr_change=true`);
+    const d = await r.json();
+    COINS.forEach(c => {
+      const data = d[c.geckoId];
+      if (data) {
+        const krw = Math.round(data.usd * usdKrw);
+        prices[c.id] = { usd: data.usd, krw, change24h: data.usd_24h_change };
+        const mbEl = document.getElementById(`mb-${c.id.toLowerCase()}`);
+        if (mbEl) {
+          mbEl.textContent = '₩' + krw.toLocaleString();
+          mbEl.style.color = data.usd_24h_change >= 0 ? 'var(--up)' : 'var(--down)';
+        }
+      }
+    });
+  } catch(e) {}
+
+  // Fear & Greed
+  try {
+    const r = await fetch('https://api.alternative.me/fng/?limit=1');
+    const d = await r.json();
+    const val = parseInt(d.data[0].value);
+    const label = d.data[0].value_classification;
+    const el = document.getElementById('mb-fg');
     el.textContent = `${val} (${label})`;
     el.style.color = val > 60 ? 'var(--up)' : val < 40 ? 'var(--down)' : 'var(--hold)';
   } catch(e) {}
 
-  // BTC price via CoinGecko
+  renderCoinGrid();
+}
+
+// ==================== FIREBASE ====================
+async function loadHistories() {
+  for (const c of COINS) {
+    try {
+      const ref = doc(db, HISTORY_COLLECTION, c.id);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        histories[c.id] = snap.data().history || [];
+      }
+    } catch(e) {}
+  }
+}
+
+async function saveHistory(coinId) {
   try {
-    const r = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd&include_24hr_change=true');
-    const d = await r.json();
-    const btcEl = document.getElementById('btcusd');
-    const btc = d.bitcoin;
-    btcEl.textContent = `$${btc.usd.toLocaleString()}`;
-    btcEl.style.color = btc.usd_24h_change > 0 ? 'var(--up)' : 'var(--down)';
-  } catch(e) {}
-
-  // USD/KRW via exchangerate
-  try {
-    const r = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
-    const d = await r.json();
-    document.getElementById('usdkrw').textContent = d.rates.KRW.toFixed(0) + '원';
-  } catch(e) {}
-
-  // Major indices — note: due to CORS, we'll show a note
-  document.getElementById('kospi').textContent = '장중확인';
-  document.getElementById('nasdaq').textContent = '장중확인';
-  document.getElementById('sp500').textContent = '장중확인';
-}
-
-fetchMarketOverview();
-
-// ==================== PORTFOLIO MANAGEMENT ====================
-async function savePortfolio() {
-  // Save only stable data to Firestore
-  for (const p of portfolio) {
-    await setDoc(doc(db, COLLECTION, String(p.id)), {
-      id: p.id,
-      ticker: p.ticker,
-      type: p.type,
-      currency: p.currency,
-      avgPrice: p.avgPrice || null,
-      name: p.name || null,
-    });
+    const ref = doc(db, HISTORY_COLLECTION, coinId);
+    await setDoc(ref, { history: histories[coinId] });
+  } catch(e) {
+    console.warn('Firebase save failed:', e);
   }
 }
 
-async function saveItem(item) {
-  await setDoc(doc(db, COLLECTION, String(item.id)), {
-    id: item.id,
-    ticker: item.ticker,
-    type: item.type,
-    currency: item.currency,
-    avgPrice: item.avgPrice || null,
-    name: item.name || null,
-  });
+// ==================== HIT RATE ====================
+function isCorrect(signal, priceBefore, priceAfter) {
+  if (!priceBefore || !priceAfter) return null;
+  const change = (priceAfter - priceBefore) / priceBefore;
+  if (signal === 'BUY')     return change > 0.005;
+  if (signal === 'SELL')    return change < -0.005;
+  if (signal === 'PARTIAL') return change < -0.005;
+  if (signal === 'HOLD')    return Math.abs(change) <= 0.05;
+  return null;
 }
 
-async function deleteItem(id) {
-  await deleteDoc(doc(db, COLLECTION, String(id)));
+function calcHitRate(coinId) {
+  const hist = histories[coinId];
+  const judged = hist.filter(e => e.wasCorrect !== null && e.wasCorrect !== undefined);
+  if (judged.length === 0) return { rate: null, correct: 0, total: 0 };
+  const correct = judged.filter(e => e.wasCorrect === true).length;
+  return { rate: Math.round((correct / judged.length) * 100), correct, total: judged.length };
 }
 
-async function loadPortfolio() {
-  const snapshot = await getDocs(collection(db, COLLECTION));
-  portfolio = snapshot.docs.map(d => ({
-    ...d.data(),
-    price: null, change: null, signal: null, analysis: null, indicators: null, loading: false
-  }));
-  renderPortfolio();
-}
+function analyzeHitRateCauses(coinId) {
+  const hist = histories[coinId].filter(e => e.wasCorrect !== null && e.wasCorrect !== undefined);
+  if (hist.length < 2) return [];
 
-async function addTicker() {
-  const type = document.getElementById('assetType').value;
-  const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-  const avgPrice = parseFloat(document.getElementById('avgPriceInput').value) || null;
-  const currency = document.getElementById('currency').value;
+  const wrong = hist.filter(e => !e.wasCorrect);
+  const signals = { BUY: 0, SELL: 0, PARTIAL: 0, HOLD: 0 };
+  wrong.forEach(e => signals[e.signal] = (signals[e.signal] || 0) + 1);
 
-  if (!ticker) { showToast('티커를 입력해주세요', 'error'); return; }
-  if (portfolio.find(p => p.ticker === ticker)) {
-    showToast(`${ticker} 이미 추가된 종목입니다`, 'error'); return;
+  const suggestions = [];
+  const totalWrong = wrong.length;
+
+  if (signals.BUY / totalWrong > 0.5) {
+    suggestions.push('BUY 신호 오류가 많음 → 상승 과신 경향. 거래량 확인 후 매수 판단 요구 강화 필요');
+  }
+  if (signals.SELL / totalWrong > 0.5 || signals.PARTIAL / totalWrong > 0.5) {
+    suggestions.push('SELL/PARTIAL 신호 오류가 많음 → 하락 과신 경향. 지지선 반등 가능성 더 고려 필요');
+  }
+  if (signals.HOLD / totalWrong > 0.5) {
+    suggestions.push('HOLD 신호 오류가 많음 → 방향성 판단 미흡. 변동성 지표(ATR) 반영 강화 필요');
   }
 
-  const item = {
-    id: Date.now(),
-    ticker,
-    type,
-    currency,
-    avgPrice,
-    price: null,
-    change: null,
-    signal: null,
-    analysis: null,
-    indicators: null,
-    loading: false,
-  };
-
-  portfolio.push(item);
-  await saveItem(item);
-  renderPortfolio();
-
-  document.getElementById('tickerInput').value = '';
-  document.getElementById('avgPriceInput').value = '';
-
-  showToast(`${ticker} 추가됨`, 'success');
-  // Auto analyze
-  analyzeItem(item.id);
-}
-
-async function removeTicker(id) {
-  portfolio = portfolio.filter(p => p.id !== id);
-  await deleteItem(id);
-  renderPortfolio();
-}
-
-function analyzeAll() {
-  if (portfolio.length === 0) { showToast('종목을 먼저 추가해주세요', 'error'); return; }
-  portfolio.forEach(item => analyzeItem(item.id));
-  showToast('전체 분석 시작', 'success');
-}
-
-// ==================== RENDER ====================
-function renderPortfolio() {
-  const grid = document.getElementById('portfolioGrid');
-  const count = document.getElementById('portfolioCount');
-  count.textContent = `${portfolio.length}개 종목`;
-
-  if (portfolio.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state" id="emptyState">
-        <div class="icon">◈</div>
-        <h3>종목을 추가해보세요</h3>
-        <p>위에서 티커를 입력하면<br>AI가 실시간으로 투자 의견을 분석합니다</p>
-      </div>`;
-    return;
+  if (suggestions.length === 0) {
+    suggestions.push('특정 패턴 없음 → 시장 변동성이 예측을 어렵게 만든 상황. 더 많은 데이터 축적 필요');
   }
 
-  grid.innerHTML = portfolio.map(item => renderCard(item)).join('');
+  suggestions.push('단기 분석 신뢰도 향상을 위해 RSI 과매수/과매도 구간 (30/70 기준) 가중치 증가 권장');
+  suggestions.push('공포&탐욕 지수가 10 이하 또는 90 이상일 때 역발상 전략 적용 고려');
+
+  return suggestions;
 }
 
-function renderCard(item) {
-  const typeBadge = { US: '미국주식', KR: '국내주식', CRYPTO: '암호화폐', ETF: 'ETF' };
-  const typeClass = { US: 'type-us', KR: 'type-kr', CRYPTO: 'type-crypto', ETF: 'type-etf' };
+// ==================== RENDER COIN GRID ====================
+function renderCoinGrid() {
+  const grid = document.getElementById('coinGrid');
+  grid.innerHTML = COINS.map(c => renderCoinCard(c)).join('');
+}
 
+function renderCoinCard(coin) {
+  const a = analyses[coin.id];
+  const p = prices[coin.id];
+  const hist = histories[coin.id];
+  const lastEntry = hist.length > 0 ? hist[hist.length - 1] : null;
+
+  // Price section
   let priceHtml = '';
-  if (item.price) {
-    const sym = item.currency === 'KRW' ? '₩' : '$';
-    const changeSign = item.change >= 0 ? '+' : '';
-    priceHtml = `
-      <div class="card-price-row">
-        <div class="price-main">${sym}${item.price.toLocaleString()}</div>
-        <div class="price-change ${item.change >= 0 ? 'price-up' : 'price-down'}">
-          ${changeSign}${item.change?.toFixed(2)}%
-        </div>
-      </div>`;
-    if (item.avgPrice) {
-      const pnl = ((item.price - item.avgPrice) / item.avgPrice * 100).toFixed(2);
-      const pnlSign = pnl >= 0 ? '+' : '';
-      priceHtml += `<div class="avg-display"><span>평단</span>${sym}${item.avgPrice.toLocaleString()} <span>수익률</span><span style="color:${pnl >= 0 ? 'var(--up)' : 'var(--down)'}">${pnlSign}${pnl}%</span></div>`;
+  if (p) {
+    const changeSign = p.change24h >= 0 ? '+' : '';
+    const changeClass = p.change24h >= 0 ? 'badge-up' : 'badge-down';
+
+    let vsPrevHtml = '';
+    if (lastEntry && lastEntry.priceKRW) {
+      const vsChange = ((p.krw - lastEntry.priceKRW) / lastEntry.priceKRW * 100);
+      const vsSign = vsChange >= 0 ? '+' : '';
+      const vsClass = vsChange >= 0 ? 'badge-up' : 'badge-down';
+      vsPrevHtml = `<div class="price-badge ${vsClass}" title="지난 분석 대비">${vsSign}${vsChange.toFixed(2)}% (지난분석비)</div>`;
     }
+
+    priceHtml = `
+      <div class="card-price-section">
+        <div class="price-row">
+          <div class="price-krw">₩${p.krw.toLocaleString()}</div>
+          <div class="price-badges">
+            <div class="price-badge ${changeClass}">${changeSign}${p.change24h.toFixed(2)}% (24h)</div>
+            ${vsPrevHtml}
+          </div>
+        </div>
+        <div class="price-usd">$${p.usd.toLocaleString(undefined, {maximumFractionDigits: 4})}</div>
+      </div>`;
+  } else {
+    priceHtml = `<div class="card-price-section"><div class="price-placeholder">가격 로딩중...</div></div>`;
   }
 
+  // Signal section
   let signalHtml = '';
-  if (item.loading) {
-    signalHtml = `<div class="signal-area"><div class="signal-badge signal-loading">
-      <span class="signal-dot"></span>분석중...</div></div>`;
-  } else if (item.signal) {
-    const signalMap = {
-      BUY: { cls: 'signal-buy', label: '▲ 추가 매수' },
-      HOLD: { cls: 'signal-hold', label: '◼ 보류' },
-      PARTIAL: { cls: 'signal-partial', label: '▽ 분할 매도' },
-      SELL: { cls: 'signal-sell', label: '▼ 전량 매도' },
-    };
-    const s = signalMap[item.signal] || signalMap.HOLD;
-    signalHtml = `<div class="signal-area"><div class="signal-badge ${s.cls}">
-      <span class="signal-dot"></span>${s.label}</div></div>`;
-  }
-
-  let analysisHtml = '';
-  if (item.loading) {
-    analysisHtml = `<div class="analysis-text loading">
-      <div class="typing-indicator"><span></span><span></span><span></span></div></div>`;
-  } else if (item.analysis) {
-    analysisHtml = `<div class="analysis-text">${item.analysis}</div>`;
-  }
-
-  let indicatorsHtml = '';
-  if (item.indicators) {
-    const ind = item.indicators;
-    indicatorsHtml = `<div class="indicators">
-      ${ind.rsi ? `<div class="indicator-item">
-        <div class="indicator-label">RSI</div>
-        <div class="indicator-value ${ind.rsi > 70 ? 'bearish' : ind.rsi < 30 ? 'bullish' : 'neutral'}">${ind.rsi}</div>
-      </div>` : ''}
-      ${ind.trend ? `<div class="indicator-item">
-        <div class="indicator-label">추세</div>
-        <div class="indicator-value ${ind.trend === '상승' ? 'bullish' : ind.trend === '하락' ? 'bearish' : 'neutral'}">${ind.trend}</div>
-      </div>` : ''}
-      ${ind.volume ? `<div class="indicator-item">
-        <div class="indicator-label">거래량</div>
-        <div class="indicator-value ${ind.volume === '증가' ? 'bullish' : 'neutral'}">${ind.volume}</div>
-      </div>` : ''}
-      ${ind.sentiment ? `<div class="indicator-item">
-        <div class="indicator-label">뉴스 감성</div>
-        <div class="indicator-value ${ind.sentiment === '긍정' ? 'bullish' : ind.sentiment === '부정' ? 'bearish' : 'neutral'}">${ind.sentiment}</div>
-      </div>` : ''}
-      ${ind.support ? `<div class="indicator-item">
-        <div class="indicator-label">지지선</div>
-        <div class="indicator-value">${ind.support}</div>
-      </div>` : ''}
+  if (a.loading) {
+    signalHtml = `<div class="card-signal-section"><div class="signal-badge sig-loading"><span class="signal-dot"></span>분석중...</div></div>`;
+  } else if (a.signal) {
+    const s = SIGNAL_MAP[a.signal] || SIGNAL_MAP.HOLD;
+    let prevSignalHtml = '';
+    if (lastEntry) {
+      const ps = SIGNAL_MAP[lastEntry.signal] || SIGNAL_MAP.HOLD;
+      prevSignalHtml = `<div class="prev-signal-badge">
+        <span class="prev-label" style="color:var(--text-dim)">이전</span>
+        <span class="prev-label" style="color:var(--text-muted)">${lastEntry.signal}</span>
+        <span class="prev-arrow">→</span>
+        <span class="prev-label" style="color:var(--text-muted)">${a.signal}</span>
+        ${a.signal !== lastEntry.signal ? '<span style="color:var(--warn);font-size:9px">변경</span>' : '<span style="color:var(--text-dim);font-size:9px">유지</span>'}
+      </div>`;
+    }
+    signalHtml = `<div class="card-signal-section">
+      <div class="signal-badge ${s.cls}"><span class="signal-dot"></span>${s.label}</div>
+      ${prevSignalHtml}
     </div>`;
   }
 
+  // Analysis section
+  let analysisHtml = '';
+  if (a.loading) {
+    analysisHtml = `<div class="card-analysis-section">
+      <div class="typing-indicator"><span></span><span></span><span></span></div>
+    </div>`;
+  } else if (a.analysis) {
+    let prevComment = '';
+    if (a.prevComment) {
+      prevComment = `<div class="analysis-prev-comment">
+        <div class="prev-comment-label">◦ 지난 분석 대비</div>
+        ${a.prevComment}
+      </div>`;
+    }
+    analysisHtml = `<div class="card-analysis-section">
+      <div class="analysis-main">${a.analysis}</div>
+      ${prevComment}
+    </div>`;
+  }
+
+  // Indicators
+  let indicatorsHtml = '';
+  if (a.indicators && !a.loading) {
+    const ind = a.indicators;
+    const rsiClass = ind.rsi > 70 ? 'bearish' : ind.rsi < 30 ? 'bullish' : 'neutral';
+    const trendClass = ind.trend === '상승' ? 'bullish' : ind.trend === '하락' ? 'bearish' : 'neutral';
+    const volClass = ind.volume === '증가' ? 'bullish' : ind.volume === '감소' ? 'bearish' : 'neutral';
+    const sentClass = ind.sentiment === '긍정' ? 'bullish' : ind.sentiment === '부정' ? 'bearish' : 'neutral';
+    indicatorsHtml = `<div class="card-indicators">
+      ${ind.rsi ? `<div class="ind-item"><div class="ind-label">RSI</div><div class="ind-value ${rsiClass}">${ind.rsi}</div></div>` : ''}
+      ${ind.trend ? `<div class="ind-item"><div class="ind-label">추세</div><div class="ind-value ${trendClass}">${ind.trend}</div></div>` : ''}
+      ${ind.volume ? `<div class="ind-item"><div class="ind-label">거래량</div><div class="ind-value ${volClass}">${ind.volume}</div></div>` : ''}
+      ${ind.sentiment ? `<div class="ind-item"><div class="ind-label">뉴스감성</div><div class="ind-value ${sentClass}">${ind.sentiment}</div></div>` : ''}
+      ${ind.support ? `<div class="ind-item"><div class="ind-label">지지선</div><div class="ind-value">${ind.support}</div></div>` : ''}
+    </div>`;
+  }
+
+  // Timestamp
+  let timestampHtml = '';
+  if (a.analyzedAt) {
+    timestampHtml = `<div class="card-timestamp">분석시각: ${new Date(a.analyzedAt).toLocaleString('ko-KR')}</div>`;
+  }
+
   return `
-    <div class="stock-card" id="card-${item.id}">
-      <div class="card-header">
-        <div>
-          <div class="card-ticker">${item.ticker}</div>
-          <div class="card-name">${item.name || ''}</div>
+    <div class="coin-card" data-coin="${coin.id}" id="card-${coin.id}">
+      <div class="card-top">
+        <div class="card-coin-info">
+          <div class="card-coin-id">${coin.id}</div>
+          <div class="card-coin-name">${coin.emoji} ${coin.name}</div>
         </div>
-        <div class="card-type-badge ${typeClass[item.type]}">${typeBadge[item.type]}</div>
+        <button class="card-analyze-btn" onclick="analyzeCoin('${coin.id}')" id="btn-${coin.id}" ${a.loading ? 'disabled' : ''}>
+          ${a.loading ? '분석중...' : '↻ 분석'}
+        </button>
       </div>
       ${priceHtml}
       ${signalHtml}
       ${analysisHtml}
       ${indicatorsHtml}
-      <div class="card-actions">
-        <button class="btn-refresh" onclick="analyzeItem(${item.id})">↻ 재분석</button>
-        <button class="btn-remove" onclick="removeTicker(${item.id})">✕ 제거</button>
-      </div>
+      ${timestampHtml}
     </div>`;
 }
 
-function updateCard(id) {
-  const item = portfolio.find(p => p.id === id);
-  if (!item) return;
-  const el = document.getElementById(`card-${id}`);
-  if (el) {
-    el.outerHTML = renderCard(item);
+// ==================== RENDER HISTORY TAB ====================
+function renderHistoryTab() {
+  const coinId = activeHistoryCoin;
+  const hist = [...histories[coinId]].reverse().slice(0, 5);
+  const { rate, correct, total } = calcHitRate(coinId);
+
+  let hitRateHtml = '';
+  if (rate !== null) {
+    const rateClass = rate >= 70 ? 'good' : rate >= 60 ? 'warn' : 'bad';
+    hitRateHtml = `
+      <div class="hit-rate-box">
+        <div class="hit-rate-left">
+          <div class="hit-rate-number ${rateClass}">${rate}%</div>
+          <div class="hit-rate-info">
+            <div class="hit-rate-label">적중률</div>
+            <div class="hit-rate-sub">${correct}/${total} 적중</div>
+            <div class="hit-rate-bar">
+              <div class="hit-rate-bar-fill ${rateClass}" style="width:${rate}%"></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+
+    if (rate < 60) {
+      const causes = analyzeHitRateCauses(coinId);
+      hitRateHtml += `
+        <div class="improvement-box">
+          <div class="improvement-title">⚠ 적중률 ${rate}% — 원인 분석 및 개선 방향</div>
+          <div class="improvement-body">
+            적중률이 60% 미만으로 분석 방법 개선이 필요합니다. 주요 원인과 개선 방향:
+            <ul class="improvement-list">
+              ${causes.map(c => `<li>${c}</li>`).join('')}
+            </ul>
+          </div>
+        </div>`;
+    }
+  } else {
+    hitRateHtml = `
+      <div class="hit-rate-box">
+        <div class="hit-rate-left">
+          <div class="hit-rate-number" style="color:var(--text-dim)">—</div>
+          <div class="hit-rate-info">
+            <div class="hit-rate-label">적중률</div>
+            <div class="hit-rate-sub">데이터 부족 (최소 2회 분석 필요)</div>
+          </div>
+        </div>
+      </div>`;
   }
+
+  let entriesHtml = '';
+  if (hist.length === 0) {
+    entriesHtml = `
+      <div class="history-no-data">
+        <div class="icon">◈</div>
+        <p>아직 분석 기록이 없습니다.<br>현재 분석 탭에서 분석을 실행하세요.</p>
+      </div>`;
+  } else {
+    const allHist = histories[coinId];
+    entriesHtml = `
+      <div class="history-list-header">최근 ${hist.length}개 분석 기록</div>
+      <div class="history-entries">
+        ${hist.map((entry, i) => {
+          const num = allHist.length - i;
+          const timeStr = new Date(entry.timestamp).toLocaleString('ko-KR');
+          const s = SIGNAL_MAP[entry.signal] || SIGNAL_MAP.HOLD;
+          let correctHtml = '';
+          if (entry.wasCorrect === true)  correctHtml = `<span class="history-correct correct-yes">✓ 적중</span>`;
+          else if (entry.wasCorrect === false) correctHtml = `<span class="history-correct correct-no">✗ 미적중</span>`;
+          else correctHtml = `<span class="history-correct correct-pending">평가 대기</span>`;
+
+          const priceStr = entry.priceKRW ? `₩${Number(entry.priceKRW).toLocaleString()}` : '—';
+
+          return `
+            <div class="history-entry">
+              <div class="history-entry-header">
+                <span class="history-num">#${num}</span>
+                <span class="history-time">${timeStr}</span>
+                <span class="history-price-info">${priceStr}</span>
+                <div class="signal-badge ${s.cls}" style="font-size:9px;padding:2px 8px;gap:5px">
+                  <span class="signal-dot"></span>${s.label}
+                </div>
+                ${correctHtml}
+              </div>
+              ${entry.analysis ? `<div class="history-entry-body">${entry.analysis}</div>` : ''}
+            </div>`;
+        }).join('')}
+      </div>`;
+  }
+
+  document.getElementById('historyContent').innerHTML = hitRateHtml + entriesHtml;
 }
 
-// ==================== PRICE FETCH ====================
-async function fetchPrice(item) {
-  if (item.type === 'CRYPTO') {
-    try {
-      const coinMap = {
-        BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana',
-        XRP: 'ripple', DOGE: 'dogecoin', ADA: 'cardano',
-        AVAX: 'avalanche-2', DOT: 'polkadot', MATIC: 'matic-network',
-        LINK: 'chainlink', UNI: 'uniswap', ATOM: 'cosmos',
-        LTC: 'litecoin', BCH: 'bitcoin-cash', NEAR: 'near',
-        APT: 'aptos', ARB: 'arbitrum', OP: 'optimism',
-      };
-      const coinId = coinMap[item.ticker] || item.ticker.toLowerCase();
-      const r = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd&include_24hr_change=true&include_market_cap=true`);
-      const d = await r.json();
-      if (d[coinId]) {
-        item.price = d[coinId].usd;
-        item.change = d[coinId].usd_24h_change;
-        item.currency = 'USD';
-        return true;
-      }
-    } catch(e) {}
-    return false;
+window.selectHistoryCoin = function(coinId) {
+  activeHistoryCoin = coinId;
+  document.querySelectorAll('.coin-sel-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.coin === coinId);
+  });
+  renderHistoryTab();
+};
+
+// ==================== ANALYZE ====================
+window.analyzeAll = async function() {
+  const btn = document.getElementById('analyzeAllBtn');
+  btn.disabled = true;
+  btn.textContent = '▶ 분석중...';
+  showToast('4개 코인 분석 시작', 'success');
+
+  // Fetch fresh prices first
+  await fetchMarketData();
+
+  // Analyze sequentially to avoid rate limits
+  for (const c of COINS) {
+    await analyzeCoinInternal(c.id);
   }
-  // For stocks, we can't directly call Yahoo Finance due to CORS
-  // We'll rely on AI knowledge for price context and signal analysis
-  return false;
-}
 
-// ==================== AI ANALYSIS ====================
-async function analyzeItem(id) {
-  const item = portfolio.find(p => p.id === id);
-  if (!item) return;
+  btn.disabled = false;
+  btn.textContent = '▶ 전체 분석';
 
-  item.loading = true;
-  updateCard(id);
+  const now = new Date().toLocaleString('ko-KR');
+  document.getElementById('lastAnalyzedTime').textContent = `마지막 분석: ${now}`;
+  showToast('전체 분석 완료', 'success');
+  if (activeTab === 'history') renderHistoryTab();
+};
 
-  // Fetch price if crypto
-  await fetchPrice(item);
+window.analyzeCoin = async function(coinId) {
+  await fetchMarketData();
+  await analyzeCoinInternal(coinId);
+  if (activeTab === 'history') renderHistoryTab();
+};
 
-  // Build context
+async function analyzeCoinInternal(coinId) {
+  const coin = COINS.find(c => c.id === coinId);
+  const a = analyses[coinId];
+  const p = prices[coinId];
+  const hist = histories[coinId];
+  const lastEntry = hist.length > 0 ? hist[hist.length - 1] : null;
+
+  a.loading = true;
+  renderCoinGrid();
+
   const now = new Date();
   const dateStr = now.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
   const timeStr = now.toLocaleTimeString('ko-KR');
 
   let priceContext = '';
-  if (item.price) {
-    priceContext = `현재가: $${item.price.toLocaleString()} (24h변동: ${item.change?.toFixed(2)}%)`;
-    if (item.avgPrice) {
-      const pnl = ((item.price - item.avgPrice) / item.avgPrice * 100).toFixed(2);
-      priceContext += `\n평균매수가: $${item.avgPrice} (현재 수익률: ${pnl}%)`;
-    }
+  if (p) {
+    priceContext = `현재가: ₩${p.krw.toLocaleString()} ($${p.usd.toLocaleString()}) | 24h변동: ${p.change24h.toFixed(2)}% | USD/KRW: ${Math.round(usdKrw)}`;
   } else {
-    priceContext = item.avgPrice ? `평균매수가: ${item.currency === 'KRW' ? '₩' : '$'}${item.avgPrice}` : '가격 정보 없음 (최신 시장 데이터 기반 분석)';
+    priceContext = '가격 정보 없음 (최신 시장 데이터 기반으로 추정 분석)';
   }
 
-  const typeLabel = { US: '미국주식', KR: '국내주식', CRYPTO: '암호화폐', ETF: 'ETF' };
+  let prevContext = '';
+  let prevSignalWasCorrect = null;
+  if (lastEntry && p) {
+    const wasCorrect = isCorrect(lastEntry.signal, lastEntry.priceKRW, p.krw);
+    prevSignalWasCorrect = wasCorrect;
+    const vsChange = ((p.krw - lastEntry.priceKRW) / lastEntry.priceKRW * 100);
+    const vsSign = vsChange >= 0 ? '+' : '';
+    const prevTime = new Date(lastEntry.timestamp).toLocaleString('ko-KR');
+    prevContext = `
+[이전 분석 정보]
+이전 분석 일시: ${prevTime}
+이전 분석 당시 가격: ₩${Number(lastEntry.priceKRW).toLocaleString()}
+이전 의견: ${lastEntry.signal} (${SIGNAL_MAP[lastEntry.signal]?.label || lastEntry.signal})
+이전 분석 대비 현재 가격 변동: ${vsSign}${vsChange.toFixed(2)}%
+이전 의견 적중 여부: ${wasCorrect === null ? '판단 불가' : wasCorrect ? '✓ 적중' : '✗ 미적중'}`;
+  }
 
-  const prompt = `당신은 경험 많은 투자 분석가입니다. 아래 종목에 대해 오늘 날짜 기준으로 투자 의견을 제시해주세요.
+  const prompt = `당신은 경험 많은 암호화폐 투자 분석가입니다.
 
-날짜: ${dateStr} ${timeStr}
-종목: ${item.ticker} (${typeLabel[item.type]})
+분석 일시: ${dateStr} ${timeStr}
+코인: ${coin.name} (${coin.id})
 ${priceContext}
+${prevContext}
 
 다음 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만:
 {
   "signal": "BUY" | "HOLD" | "PARTIAL" | "SELL",
-  "name": "종목명 (한국어/영어)",
-  "analysis": "2-3문장으로 현재 시장 상황, 기술적 지표 흐름, 최근 뉴스 감성을 종합한 투자 근거. 구체적 수치 포함.",
+  "analysis": "현재 시장 상황, 기술적 지표 흐름, 최근 뉴스 감성을 종합한 투자 근거 2-3문장. 구체적 수치 포함.",
+  "prevComment": ${lastEntry ? '"이전 분석의 적중 여부와 시장 변화 이유를 1-2문장으로. 이전 의견이 맞았는지, 왜 맞거나 틀렸는지 간략히."' : 'null'},
   "indicators": {
     "rsi": RSI 추정값 (숫자, 0-100),
     "trend": "상승" | "중립" | "하락",
     "volume": "증가" | "보통" | "감소",
     "sentiment": "긍정" | "중립" | "부정",
-    "support": "주요 지지선 가격대 (문자열)"
+    "support": "주요 지지선 가격대 (원화 기준 문자열)"
   }
 }
 
 signal 기준:
-- BUY: 기술지표 강세 + 뉴스 감성 긍정 → 추가 매수 적기
+- BUY: 기술지표 강세 + 감성 긍정 → 추가 매수 적기
 - HOLD: 방향 불명확 → 현 포지션 유지
 - PARTIAL: 일부 리스크 헤지 필요 → 분할 매도 권장
 - SELL: 하락 신호 명확 → 전량 매도 검토`;
 
   try {
-    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY === 'YOUR_NEW_API_KEY_HERE') {
-      throw new Error('API 키가 설정되지 않았습니다.');
+    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY.includes('YOUR_')) {
+      throw new Error('API 키 미설정');
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -1114,7 +1368,7 @@ signal 기준:
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
         max_tokens: 1024,
-        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 3 }],
+        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }],
         messages: [{ role: 'user', content: prompt }]
       })
     });
@@ -1125,73 +1379,80 @@ signal 기준:
     }
 
     const data = await response.json();
-
-    // Extract text from all content blocks (including after tool use)
     const textContent = (data.content || [])
       .filter(b => b.type === 'text')
       .map(b => b.text)
       .join('');
 
-    // Parse JSON
-    const jsonMatch = textContent.match(/\{[\s\S]*?\}/);
-    if (jsonMatch) {
-      const parsed = JSON.parse(jsonMatch[0]);
-      item.signal = parsed.signal;
-      item.analysis = parsed.analysis;
-      item.indicators = parsed.indicators;
-      if (parsed.name && !item.name) item.name = parsed.name;
-    } else {
-      throw new Error('JSON 파싱 실패');
+    const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('JSON 파싱 실패');
+
+    const parsed = JSON.parse(jsonMatch[0]);
+
+    // Update previous entry's wasCorrect
+    if (lastEntry && prevSignalWasCorrect !== null) {
+      hist[hist.length - 1].wasCorrect = prevSignalWasCorrect;
     }
+
+    // Build new history entry
+    const newEntry = {
+      timestamp: now.toISOString(),
+      signal: parsed.signal,
+      priceKRW: p ? p.krw : null,
+      priceUSD: p ? p.usd : null,
+      analysis: parsed.analysis,
+      prevComment: parsed.prevComment || null,
+      wasCorrect: null,
+    };
+
+    // Keep last 10 entries
+    hist.push(newEntry);
+    if (hist.length > 10) hist.splice(0, hist.length - 10);
+
+    // Update analysis state
+    a.signal = parsed.signal;
+    a.analysis = parsed.analysis;
+    a.prevComment = parsed.prevComment || null;
+    a.indicators = parsed.indicators;
+    a.analyzedAt = now.toISOString();
+    a.priceKRW = p ? p.krw : null;
+    a.priceUSD = p ? p.usd : null;
+
+    await saveHistory(coinId);
+
   } catch(e) {
-    item.signal = 'HOLD';
-    item.analysis = `분석 오류: ${e.message || '재시도해주세요.'}`;
-    showToast(`${item.ticker} 분석 실패: ${e.message}`, 'error');
+    a.signal = 'HOLD';
+    a.analysis = `분석 오류: ${e.message || '재시도해주세요.'}`;
+    a.prevComment = null;
+    showToast(`${coinId} 분석 실패: ${e.message}`, 'error');
   }
 
-  item.loading = false;
-  updateCard(id);
-  await saveItem(item);
+  a.loading = false;
+  renderCoinGrid();
 }
 
 // ==================== TOAST ====================
 let toastTimer;
-function showToast(msg, type = '') {
+window.showToast = function(msg, type = '') {
   const existing = document.querySelector('.toast');
   if (existing) existing.remove();
   clearTimeout(toastTimer);
-
   const el = document.createElement('div');
   el.className = `toast ${type}`;
   el.textContent = msg;
   document.body.appendChild(el);
-
   toastTimer = setTimeout(() => el.remove(), 3000);
-}
+};
 
-// ==================== GLOBAL WRAPPERS (module scope fix) ====================
-window.addTicker = addTicker;
-window.analyzeAll = analyzeAll;
-window.analyzeItem = analyzeItem;
-window.removeTicker = removeTicker;
+function showToast(msg, type) { window.showToast(msg, type); }
 
 // ==================== INIT ====================
 async function init() {
-  showToast('Firebase 연결중...', '');
-  await loadPortfolio();
-  showToast('종목 불러옴 ✓', 'success');
-
-  // Auto-set currency based on type
-  document.getElementById('assetType').addEventListener('change', (e) => {
-    const cur = document.getElementById('currency');
-    if (e.target.value === 'KR') cur.value = 'KRW';
-    else cur.value = 'USD';
-  });
-
-  // Enter key on ticker input
-  document.getElementById('tickerInput').addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') addTicker();
-  });
+  showToast('데이터 로딩중...', '');
+  renderCoinGrid();
+  await loadHistories();
+  await fetchMarketData();
+  showToast('준비 완료 ✓', 'success');
 }
 
 init();
