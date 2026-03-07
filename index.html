@@ -847,9 +847,6 @@
 </main>
 
 <script type="module">
-// ==================== CONFIG ====================
-const ANTHROPIC_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE'; // ⚠️ 실제 키로 교체하세요
-
 // ==================== FIREBASE ====================
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
@@ -1352,30 +1349,15 @@ signal 기준:
 - SELL: 하락 신호 명확 → 전량 매도 검토`;
 
   try {
-    if (!ANTHROPIC_API_KEY || ANTHROPIC_API_KEY.includes('YOUR_')) {
-      throw new Error('API 키 미설정');
-    }
-
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('/.netlify/functions/analyze', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': ANTHROPIC_API_KEY,
-        'anthropic-version': '2023-06-01',
-        'anthropic-beta': 'web-search-2025-03-05',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1024,
-        tools: [{ type: 'web_search_20250305', name: 'web_search', max_uses: 2 }],
-        messages: [{ role: 'user', content: prompt }]
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt }),
     });
 
     if (!response.ok) {
       const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API 오류 ${response.status}`);
+      throw new Error(err.error || `서버 오류 ${response.status}`);
     }
 
     const data = await response.json();
