@@ -36,12 +36,16 @@ exports.handler = async (event) => {
         if (!r.ok) return;
         const data = await r.json();
         const meta = data?.chart?.result?.[0]?.meta;
-        if (meta) {
+        if (meta && meta.regularMarketPrice) {
+          const prevClose = meta.chartPreviousClose || meta.previousClose || meta.regularMarketPreviousClose;
+          const changePercent = meta.regularMarketChangePercent != null
+            ? meta.regularMarketChangePercent
+            : (prevClose ? ((meta.regularMarketPrice - prevClose) / prevClose) * 100 : 0);
           results[sym] = {
             price: meta.regularMarketPrice,
-            change: meta.regularMarketChangePercent,
+            change: changePercent,
             currency: meta.currency,
-            previousClose: meta.chartPreviousClose || meta.previousClose,
+            previousClose: prevClose,
           };
         }
       } catch (e) {}
