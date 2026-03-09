@@ -1073,8 +1073,9 @@ function renderStockCard(stock) {
   // Price section
   let priceHtml = '';
   if (p) {
-    const changeSign = p.change >= 0 ? '+' : '';
-    const changeClass = p.change >= 0 ? 'badge-up' : 'badge-down';
+    const change = p.change ?? 0;
+    const changeSign = change >= 0 ? '+' : '';
+    const changeClass = change >= 0 ? 'badge-up' : 'badge-down';
 
     let vsPrevHtml = '';
     if (lastEntry && lastEntry.priceKRW) {
@@ -1093,7 +1094,7 @@ function renderStockCard(stock) {
         <div class="price-row">
           <div class="price-krw">₩${p.krw.toLocaleString()}</div>
           <div class="price-badges">
-            <div class="price-badge ${changeClass}">${changeSign}${p.change.toFixed(2)}% (1d)</div>
+            <div class="price-badge ${changeClass}">${changeSign}${change.toFixed(2)}% (1d)</div>
             ${vsPrevHtml}
           </div>
         </div>
@@ -1329,9 +1330,9 @@ async function analyzeStockInternal(stockId) {
   let priceContext = '';
   if (p) {
     if (stock.currency === 'USD') {
-      priceContext = `현재가: $${p.usd.toLocaleString(undefined, { maximumFractionDigits: 2 })} (₩${p.krw.toLocaleString()}) | 1d변동: ${p.change.toFixed(2)}% | USD/KRW: ${Math.round(usdKrw)}`;
+      priceContext = `현재가: $${p.usd.toLocaleString(undefined, { maximumFractionDigits: 2 })} (₩${p.krw.toLocaleString()}) | 1d변동: ${(p.change ?? 0).toFixed(2)}% | USD/KRW: ${Math.round(usdKrw)}`;
     } else {
-      priceContext = `현재가: ₩${p.krw.toLocaleString()} | 1d변동: ${p.change.toFixed(2)}%`;
+      priceContext = `현재가: ₩${p.krw.toLocaleString()} | 1d변동: ${(p.change ?? 0).toFixed(2)}%`;
     }
   } else {
     priceContext = '가격 정보 없음 (최신 시장 데이터 기반으로 추정 분석)';
