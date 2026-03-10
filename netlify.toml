@@ -9,6 +9,12 @@
 [functions]
   node_bundler = "esbuild"
 
+[functions."daily-coin-analyze"]
+  schedule = "0 0 * * *"
+
+[functions."daily-stock-analyze"]
+  schedule = "30 14 * * 1-5"
+
 [[headers]]
   for = "/*"
   [headers.values]

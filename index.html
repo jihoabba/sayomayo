@@ -496,6 +496,14 @@
   .ind-value.bearish { color: var(--down); }
   .ind-value.neutral { color: var(--hold); }
 
+  .card-hit-improvement {
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--warn);
+    border-top: 1px solid var(--border);
+    line-height: 1.5;
+  }
+
   .card-timestamp {
     padding: 10px 20px;
     font-family: 'DM Mono', monospace;
@@ -931,7 +939,7 @@ let activeTab = 'current';
 
 // Init state
 COINS.forEach(c => {
-  analyses[c.id] = { loading: false, signal: null, analysis: null, indicators: null, analyzedAt: null, priceKRW: null, priceUSD: null, prevComment: null };
+  analyses[c.id] = { loading: false, signal: null, analysis: null, indicators: null, hitImprovement: null, analyzedAt: null, priceKRW: null, priceUSD: null, prevComment: null };
   histories[c.id] = [];
 });
 
@@ -1170,6 +1178,12 @@ function renderCoinCard(coin) {
     </div>`;
   }
 
+  // Hit improvement suggestion (shown when hit rate < 60%)
+  let hitImprovementHtml = '';
+  if (a.hitImprovement && !a.loading) {
+    hitImprovementHtml = `<div class="card-hit-improvement">⚠ 적중률 개선 제안: ${a.hitImprovement}</div>`;
+  }
+
   // Timestamp
   let timestampHtml = '';
   if (a.analyzedAt) {
@@ -1191,6 +1205,7 @@ function renderCoinCard(coin) {
       ${signalHtml}
       ${analysisHtml}
       ${indicatorsHtml}
+      ${hitImprovementHtml}
       ${timestampHtml}
     </div>`;
 }
@@ -1364,7 +1379,7 @@ async function analyzeCoinInternal(coinId) {
 이전 의견 적중 여부: ${wasCorrect === null ? '판단 불가' : wasCorrect ? '✓ 적중' : '✗ 미적중'}`;
   }
 
-  const prompt = `당신은 경험 많은 암호화폐 투자 분석가입니다.
+  const prompt = `당신은 경험 많은 암호화폐 투자 분석가입니다. 24시간 스윙 트레이딩 관점으로 분석하세요 (내일 오전 9시 KST까지의 예측).
 
 분석 일시: ${dateStr} ${timeStr}
 코인: ${coin.name} (${coin.id})
@@ -1374,7 +1389,7 @@ ${prevContext}
 다음 JSON 형식으로만 응답하세요. 다른 텍스트 없이 JSON만:
 {
   "signal": "BUY" | "HOLD" | "PARTIAL" | "SELL",
-  "analysis": "현재 시장 상황, 기술적 지표 흐름, 최근 뉴스 감성을 종합한 투자 근거 2-3문장. 구체적 수치 포함.",
+  "analysis": "현재 시장 상황, 기술적 지표 흐름, 최근 뉴스 감성을 종합한 24h 스윙 근거 2-3문장. 구체적 수치 포함.",
   "prevComment": ${lastEntry ? '"이전 분석의 적중 여부와 시장 변화 이유를 1-2문장으로. 이전 의견이 맞았는지, 왜 맞거나 틀렸는지 간략히."' : 'null'},
   "indicators": {
     "rsi": RSI 추정값 (숫자, 0-100),
@@ -1385,11 +1400,11 @@ ${prevContext}
   }
 }
 
-signal 기준:
-- BUY: 기술지표 강세 + 감성 긍정 → 추가 매수 적기
-- HOLD: 방향 불명확 → 현 포지션 유지
-- PARTIAL: 일부 리스크 헤지 필요 → 분할 매도 권장
-- SELL: 하락 신호 명확 → 전량 매도 검토`;
+signal 기준 (24h 스윙 트레이딩):
+- BUY: 내일 오전 9시 기준 +0.5% 이상 상승 예상 → 추가 매수
+- HOLD: 방향 불명확, ±3% 이내 횡보 예상 → 현 포지션 유지
+- PARTIAL: 하락 리스크 있음 → 분할 매도 권장
+- SELL: 내일 오전 9시 기준 -0.5% 이상 하락 예상 → 전량 매도`;
 
   try {
     const response = await fetch('/.netlify/functions/analyze', {
@@ -1427,6 +1442,8 @@ signal 기준:
       priceUSD: p ? p.usd : null,
       analysis: parsed.analysis,
       prevComment: parsed.prevComment || null,
+      indicators: parsed.indicators || null,
+      hitImprovement: parsed.hitImprovement || null,
       wasCorrect: null,
     };
 
@@ -1438,7 +1455,8 @@ signal 기준:
     a.signal = parsed.signal;
     a.analysis = parsed.analysis;
     a.prevComment = parsed.prevComment || null;
-    a.indicators = parsed.indicators;
+    a.indicators = parsed.indicators || null;
+    a.hitImprovement = parsed.hitImprovement || null;
     a.analyzedAt = now.toISOString();
     a.priceKRW = p ? p.krw : null;
     a.priceUSD = p ? p.usd : null;
@@ -1476,6 +1494,34 @@ async function init() {
   showToast('데이터 로딩중...', '');
   renderCoinGrid();
   await loadHistories();
+
+  // Populate analyses state from latest history entry (auto-analysis results)
+  COINS.forEach(c => {
+    const hist = histories[c.id];
+    if (hist && hist.length > 0) {
+      const latest = hist[hist.length - 1];
+      const a = analyses[c.id];
+      a.signal = latest.signal;
+      a.analysis = latest.analysis;
+      a.prevComment = latest.prevComment || null;
+      a.indicators = latest.indicators || null;
+      a.hitImprovement = latest.hitImprovement || null;
+      a.analyzedAt = latest.timestamp;
+      a.priceKRW = latest.priceKRW;
+      a.priceUSD = latest.priceUSD;
+    }
+  });
+
+  // Show last auto-analysis timestamp
+  const allTimestamps = COINS.map(c => {
+    const h = histories[c.id];
+    return h && h.length > 0 ? h[h.length - 1].timestamp : null;
+  }).filter(Boolean);
+  if (allTimestamps.length > 0) {
+    const latest = new Date(Math.max(...allTimestamps.map(t => new Date(t)))).toLocaleString('ko-KR');
+    document.getElementById('lastAnalyzedTime').textContent = `자동 분석: ${latest}`;
+  }
+
   await fetchMarketData();
   showToast('준비 완료 ✓', 'success');
 }
